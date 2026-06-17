@@ -1,0 +1,66 @@
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 13, reused 13, downloaded 0, added 0
+Progress: resolved 24, reused 24, downloaded 0, added 0
+Progress: resolved 28, reused 28, downloaded 0, added 0
+Progress: resolved 29, reused 28, downloaded 0, added 0
+Progress: resolved 29, reused 29, downloaded 0, added 0
+Progress: resolved 32, reused 32, downloaded 0, added 0
+Progress: resolved 34, reused 33, downloaded 0, added 0
+Progress: resolved 34, reused 34, downloaded 0, added 0
+Progress: resolved 35, reused 34, downloaded 0, added 0
+Progress: resolved 47, reused 47, downloaded 0, added 0
+Progress: resolved 83, reused 82, downloaded 0, added 0
+Progress: resolved 117, reused 117, downloaded 0, added 0
+Progress: resolved 169, reused 161, downloaded 0, added 0
+Progress: resolved 220, reused 189, downloaded 0, added 0
+Progress: resolved 243, reused 212, downloaded 0, added 0
+Progress: resolved 260, reused 229, downloaded 0, added 0
+Progress: resolved 277, reused 245, downloaded 0, added 0
+Progress: resolved 284, reused 252, downloaded 0, added 0
+Progress: resolved 291, reused 259, downloaded 0, added 0
+Progress: resolved 292, reused 260, downloaded 0, added 0
+Progress: resolved 293, reused 261, downloaded 0, added 0
+Progress: resolved 304, reused 270, downloaded 0, added 0
+Progress: resolved 331, reused 299, downloaded 0, added 0
+Progress: resolved 381, reused 328, downloaded 0, added 0
+Progress: resolved 397, reused 344, downloaded 0, added 0
+Progress: resolved 406, reused 353, downloaded 0, added 0
+Progress: resolved 427, reused 374, downloaded 0, added 0
+Progress: resolved 449, reused 396, downloaded 0, added 0
+Progress: resolved 468, reused 415, downloaded 0, added 0
+Progress: resolved 498, reused 445, downloaded 0, added 0
+Progress: resolved 520, reused 467, downloaded 0, added 0
+Progress: resolved 530, reused 477, downloaded 0, added 0
+Progress: resolved 539, reused 486, downloaded 0, added 0
+Progress: resolved 542, reused 489, downloaded 0, added 0
+Progress: resolved 599, reused 498, downloaded 0, added 0
+Progress: resolved 602, reused 501, downloaded 0, added 0
+Progress: resolved 607, reused 506, downloaded 0, added 0
+Progress: resolved 608, reused 507, downloaded 0, added 0
+Progress: resolved 609, reused 508, downloaded 0, added 0
+Progress: resolved 610, reused 509, downloaded 0, added 0
+Progress: resolved 611, reused 509, downloaded 0, added 0
+Progress: resolved 612, reused 511, downloaded 0, added 0
+Progress: resolved 613, reused 512, downloaded 0, added 0
+Progress: resolved 614, reused 512, downloaded 0, added 0
+Progress: resolved 614, reused 513, downloaded 0, added 0
+Progress: resolved 615, reused 514, downloaded 0, added 0
+Packages: +509
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 615, reused 514, downloaded 0, added 1
+Progress: resolved 615, reused 514, downloaded 0, added 196
+Progress: resolved 615, reused 514, downloaded 0, added 262
+Progress: resolved 615, reused 514, downloaded 0, added 399
+Progress: resolved 615, reused 514, downloaded 0, added 494
+Progress: resolved 615, reused 514, downloaded 0, added 503
+Progress: resolved 615, reused 514, downloaded 0, added 504
+Progress: resolved 615, reused 514, downloaded 0, added 506
+Progress: resolved 615, reused 514, downloaded 1, added 506
+Progress: resolved 615, reused 514, downloaded 1, added 507, done
+.../sharp@0.34.5/node_modules/sharp install$ node install/check.js || npm run build
+.../esbuild@0.27.7/node_modules/esbuild postinstall$ node install.js
+.../sharp@0.34.5/node_modules/sharp install: Failed
+.../node_modules/unrs-resolver postinstall$ node postinstall.js
+.../esbuild@0.27.7/node_modules/esbuild postinstall: Failed
+ ELIFECYCLE  Command failed with exit code 3221225794.
+.../node_modules/unrs-resolver postinstall: Failed

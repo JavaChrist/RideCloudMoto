@@ -1,0 +1,57 @@
+
+> ridecloudmoto@0.1.0 dev C:\Users\conta\Desktop\RideCloudMoto
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.71:3000
+- Environments: .env.local
+✓ Ready in 555ms
+
+○ Compiling /login ...
+ GET /login?registered=1 200 in 4.0s (next.js: 3.3s, application-code: 632ms)
+ GET /categories 200 in 2.7s (next.js: 1815ms, application-code: 865ms)
+ GET / 200 in 986ms (next.js: 533ms, application-code: 453ms)
+[browser] Image with src "/logo512.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+ GET /categories 200 in 285ms (next.js: 3ms, application-code: 282ms)
+ GET /vehicules/motos 200 in 1450ms (next.js: 1190ms, application-code: 261ms)
+ GET /vehicules/nouveau?categorie=motos 200 in 845ms (next.js: 662ms, application-code: 183ms)
+ POST /vehicules/nouveau?categorie=motos 200 in 938ms (next.js: 6ms, application-code: 932ms)
+  └─ ƒ createVehicle({"annee":2026,"carburant":"essence","category":"motos","...":"9 items not stringified"}) in 653ms src/app/(protected)/vehicules/actions.ts
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 1915ms (next.js: 1395ms, application-code: 520ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 517ms (next.js: 13ms, application-code: 504ms)
+ GET /vehicules/motos 200 in 307ms (next.js: 24ms, application-code: 283ms)
+ GET /categories 200 in 217ms (next.js: 3ms, application-code: 214ms)
+ GET /vehicules/scooters 200 in 244ms (next.js: 17ms, application-code: 227ms)
+ GET /categories 200 in 302ms (next.js: 3ms, application-code: 299ms)
+ GET /vehicules/motos 200 in 267ms (next.js: 20ms, application-code: 247ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 489ms (next.js: 23ms, application-code: 466ms)
+✓ Compiled in 204ms
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 689ms (next.js: 168ms, application-code: 521ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 328ms (next.js: 4ms, application-code: 324ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 192ms (next.js: 3ms, application-code: 189ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 193ms (next.js: 42ms, application-code: 151ms)
+✓ Compiled in 10ms
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 1170ms (next.js: 244ms, application-code: 926ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 637ms (next.js: 4ms, application-code: 633ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 604ms (next.js: 8ms, application-code: 595ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 602ms (next.js: 185ms, application-code: 417ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 604ms (next.js: 49ms, application-code: 554ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 697ms (next.js: 223ms, application-code: 473ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 249ms (next.js: 23ms, application-code: 226ms)
+ GET /vehicule/d73f36e0-0509-405f-ace8-0e1127909bbe 200 in 129ms (next.js: 6ms, application-code: 122ms)
+ GET /parametres 200 in 698ms (next.js: 415ms, application-code: 283ms)
+ GET /parametres 200 in 333ms (next.js: 4ms, application-code: 329ms)
+ GET /categories 200 in 448ms (next.js: 130ms, application-code: 317ms)
+ GET /vehicules/motos 200 in 493ms (next.js: 145ms, application-code: 348ms)
+ GET /vehicules/nouveau?categorie=motos 200 in 463ms (next.js: 208ms, application-code: 255ms)
+ POST /vehicules/nouveau?categorie=motos 200 in 1006ms (next.js: 6ms, application-code: 1001ms)
+  └─ ƒ createVehicle({"annee":2026,"carburant":"essence","category":"motos","...":"9 items not stringified"}) in 633ms src/app/(protected)/vehicules/actions.ts
+ GET /vehicule/545a99b9-c34a-4ed2-ae3f-0a6c18aef0c1 200 in 486ms (next.js: 16ms, application-code: 470ms)
+ GET /vehicule/545a99b9-c34a-4ed2-ae3f-0a6c18aef0c1 200 in 507ms (next.js: 4ms, application-code: 503ms)
+ POST /vehicule/545a99b9-c34a-4ed2-ae3f-0a6c18aef0c1 200 in 749ms (next.js: 22ms, application-code: 726ms)
+  └─ ƒ addMaintenanceEntry("545a99b9-c34a-4ed2-ae3f-0a6c18aef0c1", {"cout":null,"date_entretien":"2026-06-17","description":"Entretien planifié (Moteur)","...":"2 items not stringified"}, "48a02675-2028-4477-9923-27047f8f0d9e") in 346ms src/app/(protected)/vehicule/[id]/actions.ts
+ GET /vehicules/motos 200 in 409ms (next.js: 13ms, application-code: 396ms)
+ GET /categories 200 in 219ms (next.js: 2ms, application-code: 216ms)
+ GET /vehicules/scooters 200 in 167ms (next.js: 22ms, application-code: 145ms)
+ GET /categories 200 in 157ms (next.js: 2ms, application-code: 155ms)
