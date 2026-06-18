@@ -12,31 +12,43 @@ export default function ConfidentialitePage() {
         {
           heading: "Données collectées",
           body: [
-            "Nous collectons votre adresse e-mail, votre nom, les informations relatives à vos véhicules (modèle, kilométrage, entretiens) et les documents que vous importez.",
+            "Identité : adresse e-mail, nom complet (facultatif), mot de passe (hashé par Supabase).",
+            "Données métier : véhicules (moto/scooter, modèle, kilométrage, immatriculation), entretiens, modifications, photos et documents que vous importez.",
+            "Facturation : identifiants Mollie en cas d'abonnement Premium payant.",
+            "Technique : cookies de session, endpoint de notification push (si activé), adresse IP et journaux techniques.",
           ],
         },
         {
           heading: "Finalités",
           body: [
-            "Ces données servent uniquement à fournir le service : gestion du carnet d'entretien, rappels, notifications et gestion de l'abonnement.",
+            "Ces données servent uniquement à fournir le service : gestion du carnet d'entretien, plan d'entretien, rappels et notifications, et gestion de l'abonnement. Aucune donnée n'est utilisée à des fins publicitaires.",
           ],
         },
         {
           heading: "Hébergement",
           body: [
-            "Les données sont hébergées au sein de l'Union européenne (Supabase / Vercel, région Paris). Les paiements sont gérés par Mollie.",
+            "Les données sont hébergées au sein de l'Union européenne (Supabase et Vercel, région Paris).",
+          ],
+        },
+        {
+          heading: "Sous-traitants",
+          body: [
+            "Supabase Inc. (base de données, authentification, stockage — UE).",
+            "Vercel Inc. (hébergement et CDN — région Paris, UE).",
+            "Mollie B.V. (paiements SEPA et carte — Pays-Bas, UE), uniquement en cas d'abonnement payant.",
+            "Cette application n'utilise aucun service d'intelligence artificielle et ne transmet vos données à aucun sous-traitant d'IA.",
           ],
         },
         {
           heading: "Conservation et suppression",
           body: [
-            "Vos données sont conservées tant que votre compte est actif. Vous pouvez supprimer votre compte et l'ensemble de vos données à tout moment depuis les paramètres.",
+            "Vos données sont conservées tant que votre compte est actif. Vous pouvez supprimer votre compte et l'ensemble de vos données à tout moment depuis les paramètres (effacement immédiat).",
           ],
         },
         {
           heading: "Vos droits",
           body: [
-            "Vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité de vos données. Contactez-nous pour exercer ces droits.",
+            "Vous disposez d'un droit d'accès, de rectification, d'effacement, de portabilité et d'opposition. Pour les exercer, contactez-nous à support@javachrist.fr.",
           ],
         },
       ]}

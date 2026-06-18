@@ -33,6 +33,18 @@ export default function RgpdPage() {
             "Seuls des cookies strictement nécessaires (session d'authentification, préférences d'affichage) sont utilisés. Aucun traceur publicitaire.",
           ],
         },
+        {
+          heading: "Sous-traitants",
+          body: [
+            "Vos données sont traitées par Supabase (base de données, UE), Vercel (hébergement, UE) et Mollie (paiements, UE, uniquement en cas d'abonnement payant). Aucun service d'intelligence artificielle n'est utilisé.",
+          ],
+        },
+        {
+          heading: "Contact & réclamation",
+          body: [
+            "Pour exercer vos droits, écrivez à support@javachrist.fr. Vous disposez également du droit d'introduire une réclamation auprès de la CNIL (www.cnil.fr).",
+          ],
+        },
       ]}
     />
   );

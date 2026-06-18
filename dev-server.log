@@ -55,3 +55,25 @@
  GET /categories 200 in 219ms (next.js: 2ms, application-code: 216ms)
  GET /vehicules/scooters 200 in 167ms (next.js: 22ms, application-code: 145ms)
  GET /categories 200 in 157ms (next.js: 2ms, application-code: 155ms)
+ GET / 200 in 1042ms (next.js: 80ms, application-code: 962ms)
+[browser] Image with src "/logo512.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+ GET /tarifs 200 in 1220ms (next.js: 809ms, application-code: 411ms)
+ GET /categories 200 in 338ms (next.js: 3ms, application-code: 335ms)
+ GET /login 200 in 96ms (next.js: 25ms, application-code: 71ms)
+ GET /login 200 in 69ms (next.js: 9ms, application-code: 60ms)
+ GET /forgot-password 200 in 868ms (next.js: 826ms, application-code: 42ms)
+ GET /register 200 in 778ms (next.js: 722ms, application-code: 56ms)
+✓ Compiled in 884ms
+ GET /cgu 200 in 604ms (next.js: 475ms, application-code: 128ms)
+✓ Compiled in 164ms
+ GET /register 200 in 341ms (next.js: 193ms, application-code: 148ms)
+✓ Compiled in 253ms
+ GET /register 200 in 334ms (next.js: 130ms, application-code: 204ms)
+ GET /register 200 in 91ms (next.js: 14ms, application-code: 76ms)
+✓ Compiled in 280ms
+ GET /register 200 in 482ms (next.js: 297ms, application-code: 186ms)
+✓ Compiled in 201ms
+ GET /register 200 in 458ms (next.js: 157ms, application-code: 301ms)
+ GET /register 200 in 154ms (next.js: 5ms, application-code: 149ms)
+ GET /register 200 in 62ms (next.js: 6ms, application-code: 56ms)
+ GET /login 200 in 145ms (next.js: 95ms, application-code: 50ms)
