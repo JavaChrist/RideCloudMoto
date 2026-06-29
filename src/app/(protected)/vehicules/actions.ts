@@ -43,6 +43,13 @@ export async function createVehicle(input: unknown): Promise<ActionResult> {
   }
   const state = getUserPlanState(profile as Profile);
 
+  if (!state.hasAccess) {
+    return {
+      ok: false,
+      error: "Activez votre code concessionnaire ou souscrivez au Premium pour ajouter un véhicule.",
+    };
+  }
+
   const { count } = await supabase
     .from("vehicles")
     .select("id", { count: "exact", head: true })

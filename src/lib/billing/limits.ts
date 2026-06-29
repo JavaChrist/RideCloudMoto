@@ -3,11 +3,13 @@ import type { PlanId } from "./plans";
 import { maxVehiclesForPlan } from "./plans";
 
 export interface PlanState {
-  /** Plan effectif appliqué à l'utilisateur (offre concessionnaire incluse). */
+  /** Plan effectif pour quotas et fonctionnalités (free = offre concessionnaire active). */
   effectivePlan: PlanId;
-  /** Plan réellement payé (issu de Mollie). */
+  /** Plan réellement payé via Mollie. */
   paidPlan: PlanId;
-  /** True si l'accès Premium provient de l'offre concessionnaire (gratuite). */
+  /** L'utilisateur peut utiliser l'application (offre concessionnaire ou Premium payant). */
+  hasAccess: boolean;
+  /** True si l'accès provient de l'offre gratuite concessionnaire (1 véhicule, durée limitée). */
   isDealerOffer: boolean;
   /** Date de fin de l'offre concessionnaire, si applicable. */
   dealerPremiumUntil: Date | null;
@@ -22,7 +24,6 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 /**
  * Détermine si l'abonnement payant Mollie est expiré.
- * (annulé + date de renouvellement dépassée)
  */
 export function isSubscriptionExpired(profile: Profile, at: Date = new Date()): boolean {
   if (profile.plan_canceled_at && profile.plan_renews_at) {
@@ -32,13 +33,15 @@ export function isSubscriptionExpired(profile: Profile, at: Date = new Date()): 
 }
 
 /**
- * Calcule l'état de plan effectif d'un utilisateur en combinant :
- *  1. L'offre concessionnaire (Premium gratuit jusqu'à dealer_premium_until)
- *  2. L'abonnement payant Mollie (et son éventuelle expiration)
+ * Calcule l'état de plan effectif :
+ *  1. Offre concessionnaire active → Gratuit (1 véhicule), accès autorisé
+ *  2. Abonnement Premium Mollie actif → Premium, accès autorisé
+ *  3. Sinon → pas d'accès (Premium requis ou code concessionnaire)
  */
 export function getUserPlanState(profile: Profile, at: Date = new Date()): PlanState {
   const expired = isSubscriptionExpired(profile, at);
-  const paidPlan: PlanId = expired ? "free" : profile.plan === "premium" ? "premium" : "free";
+  const paidPlan: PlanId =
+    expired ? "free" : profile.plan === "premium" ? "premium" : "free";
 
   let dealerPremiumUntil: Date | null = null;
   let dealerActive = false;
@@ -55,18 +58,33 @@ export function getUserPlanState(profile: Profile, at: Date = new Date()): PlanS
     }
   }
 
-  const isDealerOffer = dealerActive && paidPlan !== "premium";
-  const effectivePlan: PlanId = dealerActive || paidPlan === "premium" ? "premium" : "free";
+  const hasPaidPremium = paidPlan === "premium" && !expired;
+  const isDealerOffer = dealerActive && !hasPaidPremium;
+  const hasAccess = dealerActive || hasPaidPremium;
+
+  let effectivePlan: PlanId;
+  if (hasPaidPremium) {
+    effectivePlan = "premium";
+  } else if (dealerActive) {
+    effectivePlan = "free";
+  } else {
+    effectivePlan = "free";
+  }
 
   return {
     effectivePlan,
     paidPlan,
+    hasAccess,
     isDealerOffer,
     dealerPremiumUntil,
     dealerDaysLeft: dealerActive ? dealerDaysLeft : null,
     isExpired: expired,
-    maxVehicles: maxVehiclesForPlan(effectivePlan),
+    maxVehicles: hasAccess ? maxVehiclesForPlan(effectivePlan) : 0,
   };
+}
+
+export function hasAppAccess(profile: Profile, at: Date = new Date()): boolean {
+  return getUserPlanState(profile, at).hasAccess;
 }
 
 export function isPremium(profile: Profile, at: Date = new Date()): boolean {

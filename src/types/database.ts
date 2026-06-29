@@ -133,3 +133,13 @@ export interface PushSubscriptionRow {
   user_agent: string | null;
   created_at: string;
 }
+
+export interface DealerActivationCode {
+  id: string;
+  code: string;
+  dealer_name: string | null;
+  used_by: string | null;
+  used_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+}

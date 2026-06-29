@@ -28,9 +28,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 
-export function RegisterForm() {
+interface RegisterFormProps {
+  initialDealerCode?: string;
+}
+
+export function RegisterForm({ initialDealerCode = "" }: RegisterFormProps) {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
 
@@ -41,6 +46,7 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      dealerCode: initialDealerCode,
       acceptCgu: false as unknown as true,
     },
   });
@@ -48,11 +54,16 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterInput) {
     setLoading(true);
     const supabase = createClient();
+    const dealerCode = values.dealerCode?.trim().toUpperCase();
+
     const { error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
       options: {
-        data: { full_name: values.fullName },
+        data: {
+          full_name: values.fullName,
+          ...(dealerCode ? { dealer_activation_code: dealerCode } : {}),
+        },
         emailRedirectTo: `${getSiteUrl()}/auth/callback`,
       },
     });
@@ -70,7 +81,8 @@ export function RegisterForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Créer un compte</CardTitle>
         <CardDescription>
-          12 mois Premium offerts à l&apos;inscription par votre concessionnaire.
+          Entrez le code remis par votre concessionnaire pour 12 mois gratuits (1 véhicule),
+          ou créez un compte et activez-le plus tard / souscrivez au Premium.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -98,6 +110,29 @@ export function RegisterForm() {
                   <FormControl>
                     <Input type="email" placeholder="vous@exemple.fr" autoComplete="email" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dealerCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Code concessionnaire</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Remis à l'achat — ex. AB-123-CD"
+                      autoComplete="off"
+                      spellCheck={false}
+                      className="font-mono uppercase tracking-wider"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Format plaque : AB-123-CD. Sans code, seul le Premium donne accès.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

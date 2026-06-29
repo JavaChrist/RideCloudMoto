@@ -17,14 +17,17 @@ export default async function TarifsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let currentPlan: "free" | "premium" | undefined;
+  let currentPlan: "free" | "premium" | "none" | undefined;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .maybeSingle();
-    if (profile) currentPlan = getUserPlanState(profile as Profile).effectivePlan;
+    if (profile) {
+      const state = getUserPlanState(profile as Profile);
+      currentPlan = state.hasAccess ? state.effectivePlan : "none";
+    }
   }
 
   return (
@@ -44,7 +47,7 @@ export default async function TarifsPage() {
         <div className="mb-10 text-center">
           <h1 className="text-3xl font-bold tracking-tight">Des tarifs simples</h1>
           <p className="mt-2 text-muted-foreground">
-            Commencez gratuitement. Passez en Premium quand vous le souhaitez.
+            Accès via code concessionnaire (12 mois, 1 véhicule) ou abonnement Premium.
           </p>
         </div>
         <PricingCards currentPlan={currentPlan} />

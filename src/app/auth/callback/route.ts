@@ -21,11 +21,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=auth`);
   }
 
-  // Création idempotente du profil + offre Premium concessionnaire
   if (data.user) {
     try {
       const admin = createAdminClient();
-      await ensureProfile(admin, data.user.id, data.user.email ?? "");
+      const meta = data.user.user_metadata ?? {};
+      const dealerCode =
+        typeof meta.dealer_activation_code === "string" ? meta.dealer_activation_code : null;
+
+      await ensureProfile(admin, data.user.id, data.user.email ?? "", {
+        dealerActivationCode: dealerCode,
+      });
     } catch (e) {
       console.error("[auth/callback] ensureProfile", e);
     }

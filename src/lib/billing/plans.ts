@@ -19,7 +19,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
   free: {
     id: "free",
     name: "Gratuit",
-    tagline: "L'essentiel pour suivre votre véhicule",
+    tagline: "Offert 12 mois par votre concessionnaire (code d'activation)",
     prices: { monthly: null, yearly: null },
     maxVehicles: 1,
     features: [

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, Sparkles, CheckCircle2 } from "lucide-react";
+import { Sparkles, CheckCircle2, KeyRound } from "lucide-react";
 import type { Profile } from "@/types/database";
 import { getUserPlanState } from "@/lib/billing/limits";
 import { formatDate } from "@/lib/utils/date";
@@ -9,64 +9,93 @@ import { Button } from "@/components/ui/button";
 import { UpgradeButton } from "./upgrade-button";
 import { CancelSubscriptionButton } from "./cancel-subscription-button";
 import { SyncSubscriptionButton } from "./sync-subscription-button";
+import { DealerActivationForm } from "./dealer-activation-form";
+import { DealerOfferCountdown } from "./dealer-offer-countdown";
 
 export function SubscriptionSection({ profile }: { profile: Profile }) {
   const state = getUserPlanState(profile);
 
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Abonnement</CardTitle>
-          <Badge variant={state.effectivePlan === "premium" ? "default" : "secondary"}>
-            {state.effectivePlan === "premium"
-              ? state.isDealerOffer
-                ? "Premium offert"
-                : "Premium"
-              : "Gratuit"}
-          </Badge>
-        </div>
-        <CardDescription>Gérez votre formule RideCloudMoto.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {state.isDealerOffer ? (
-          <div className="flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
-            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-            <span>
-              Premium offert par votre concessionnaire jusqu&apos;au{" "}
-              <strong>{formatDate(state.dealerPremiumUntil)}</strong>
-              {state.dealerDaysLeft != null ? ` (${state.dealerDaysLeft} j restants)` : ""}.
-              Souscrivez dès maintenant pour continuer sans interruption ensuite.
-            </span>
-          </div>
-        ) : state.effectivePlan === "premium" ? (
-          <p className="flex items-center gap-2 text-sm">
-            <CheckCircle2 className="h-4 w-4 text-success" />
-            Abonnement actif
-            {profile.plan_renews_at
-              ? ` · renouvellement le ${formatDate(profile.plan_renews_at)}`
-              : ""}
-            {profile.plan_status === "canceled" ? " · résilié (actif jusqu'à échéance)" : ""}
-          </p>
-        ) : (
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Sparkles className="h-4 w-4 text-primary" />
-            Passez en Premium pour débloquer véhicules illimités, notifications et exports.
-          </p>
-        )}
+  const badgeLabel = !state.hasAccess
+    ? "Accès requis"
+    : state.isDealerOffer
+      ? "Gratuit concessionnaire"
+      : state.effectivePlan === "premium"
+        ? "Premium"
+        : "Gratuit";
 
-        <div className="flex flex-wrap items-center gap-2">
-          {state.effectivePlan === "premium" && !state.isDealerOffer && profile.plan_status !== "canceled" ? (
-            <CancelSubscriptionButton />
+  return (
+    <>
+      {!state.hasAccess ? (
+        <Card className="border-primary/30">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              <CardTitle className="text-base">Activer votre accès</CardTitle>
+            </div>
+            <CardDescription>
+              Saisissez le code remis par votre concessionnaire ou souscrivez au Premium.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DealerActivationForm />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {state.isDealerOffer && state.dealerPremiumUntil ? (
+        <DealerOfferCountdown
+          expiresAt={state.dealerPremiumUntil.toISOString()}
+          variant="card"
+        />
+      ) : null}
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Abonnement</CardTitle>
+            <Badge variant={state.effectivePlan === "premium" ? "default" : "secondary"}>
+              {badgeLabel}
+            </Badge>
+          </div>
+          <CardDescription>Gérez votre formule RideCloudMoto.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {state.isDealerOffer ? (
+            <p className="text-sm text-muted-foreground">
+              Offre gratuite concessionnaire · 1 véhicule. Sans abonnement Premium à l&apos;échéance,
+              l&apos;accès à l&apos;application sera suspendu.
+            </p>
+          ) : state.effectivePlan === "premium" ? (
+            <p className="flex items-center gap-2 text-sm">
+              <CheckCircle2 className="h-4 w-4 text-success" />
+              Abonnement Premium actif
+              {profile.plan_renews_at
+                ? ` · renouvellement le ${formatDate(profile.plan_renews_at)}`
+                : ""}
+              {profile.plan_status === "canceled" ? " · résilié (actif jusqu'à échéance)" : ""}
+            </p>
           ) : (
-            <UpgradeButton label={state.isDealerOffer ? "Souscrire maintenant" : "Passer en Premium"} />
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Souscrivez au Premium pour accéder à RideCloudMoto.
+            </p>
           )}
-          <SyncSubscriptionButton />
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/tarifs">Voir les tarifs</Link>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {state.effectivePlan === "premium" && !state.isDealerOffer && profile.plan_status !== "canceled" ? (
+              <CancelSubscriptionButton />
+            ) : (
+              <UpgradeButton
+                label={state.isDealerOffer ? "Passer en Premium" : "Souscrire au Premium"}
+              />
+            )}
+            <SyncSubscriptionButton />
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/tarifs">Voir les tarifs</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </>
   );
 }

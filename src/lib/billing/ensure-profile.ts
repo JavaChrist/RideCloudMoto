@@ -1,45 +1,39 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { redeemDealerActivationCode } from "./dealer-activation";
 
-const DEALER_FREE_PREMIUM_MONTHS = Number(process.env.DEALER_FREE_PREMIUM_MONTHS ?? 12);
+export interface EnsureProfileOptions {
+  dealerActivationCode?: string | null;
+}
 
 /**
- * Upsert idempotent de la row `profiles`. Positionne la période Premium
- * offerte par le concessionnaire si elle n'existe pas encore.
- * Non bloquant : ne lève jamais (log only).
+ * Upsert idempotent de la row `profiles`.
+ * N'accorde plus l'offre concessionnaire automatiquement — uniquement via code.
  */
 export async function ensureProfile(
   admin: SupabaseClient,
   userId: string,
-  email: string
+  email: string,
+  options?: EnsureProfileOptions
 ): Promise<void> {
   try {
     const { data: existing } = await admin
       .from("profiles")
-      .select("id, dealer_premium_until")
+      .select("id")
       .eq("id", userId)
       .maybeSingle();
 
     if (!existing) {
-      const until = new Date();
-      until.setMonth(until.getMonth() + DEALER_FREE_PREMIUM_MONTHS);
-      await admin.from("profiles").upsert(
-        {
-          id: userId,
-          email,
-          dealer_premium_until: until.toISOString(),
-        },
-        { onConflict: "id" }
-      );
-      return;
+      await admin.from("profiles").upsert({ id: userId, email }, { onConflict: "id" });
+    } else {
+      await admin.from("profiles").update({ email }).eq("id", userId);
     }
 
-    if (!existing.dealer_premium_until) {
-      const until = new Date();
-      until.setMonth(until.getMonth() + DEALER_FREE_PREMIUM_MONTHS);
-      await admin
-        .from("profiles")
-        .update({ email, dealer_premium_until: until.toISOString() })
-        .eq("id", userId);
+    const code = options?.dealerActivationCode?.trim();
+    if (code) {
+      const result = await redeemDealerActivationCode(admin, userId, email, code);
+      if (!result.ok) {
+        console.warn("[ensureProfile] dealer code not redeemed:", result.error);
+      }
     }
   } catch (err) {
     console.error("[ensureProfile]", err);

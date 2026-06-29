@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getUserPlanState, isSubscriptionExpired } from "./limits";
+import { getUserPlanState, hasAppAccess, isSubscriptionExpired } from "./limits";
 import type { Profile } from "@/types/database";
 
 function makeProfile(overrides: Partial<Profile> = {}): Profile {
@@ -25,41 +25,49 @@ function makeProfile(overrides: Partial<Profile> = {}): Profile {
 describe("getUserPlanState — offre concessionnaire", () => {
   const now = new Date("2026-06-17T00:00:00Z");
 
-  it("applique Premium offert si dealer_premium_until est futur", () => {
+  it("accorde l'accès gratuit (1 véhicule) si dealer_premium_until est futur", () => {
     const profile = makeProfile({ dealer_premium_until: "2026-12-31T00:00:00Z" });
     const state = getUserPlanState(profile, now);
-    expect(state.effectivePlan).toBe("premium");
+    expect(state.hasAccess).toBe(true);
+    expect(state.effectivePlan).toBe("free");
     expect(state.isDealerOffer).toBe(true);
-    expect(state.paidPlan).toBe("free");
+    expect(state.maxVehicles).toBe(1);
   });
 
-  it("retombe en free quand l'offre concessionnaire est expirée et aucun abo payant", () => {
+  it("bloque l'accès sans code ni abonnement", () => {
+    const state = getUserPlanState(makeProfile(), now);
+    expect(state.hasAccess).toBe(false);
+    expect(state.maxVehicles).toBe(0);
+    expect(hasAppAccess(makeProfile(), now)).toBe(false);
+  });
+
+  it("bloque l'accès quand l'offre concessionnaire est expirée sans abo payant", () => {
     const profile = makeProfile({ dealer_premium_until: "2026-01-01T00:00:00Z" });
     const state = getUserPlanState(profile, now);
-    expect(state.effectivePlan).toBe("free");
+    expect(state.hasAccess).toBe(false);
     expect(state.isDealerOffer).toBe(false);
   });
 
-  it("garde Premium via abonnement payant même après l'offre", () => {
+  it("garde Premium via abonnement payant", () => {
     const profile = makeProfile({
       plan: "premium",
-      dealer_premium_until: "2026-01-01T00:00:00Z",
+      plan_renews_at: "2026-07-01T00:00:00Z",
+    });
+    const state = getUserPlanState(profile, now);
+    expect(state.hasAccess).toBe(true);
+    expect(state.effectivePlan).toBe("premium");
+    expect(state.maxVehicles).toBeGreaterThan(1);
+  });
+
+  it("priorise Premium payant sur l'offre concessionnaire", () => {
+    const profile = makeProfile({
+      plan: "premium",
+      dealer_premium_until: "2026-12-31T00:00:00Z",
       plan_renews_at: "2026-07-01T00:00:00Z",
     });
     const state = getUserPlanState(profile, now);
     expect(state.effectivePlan).toBe("premium");
     expect(state.isDealerOffer).toBe(false);
-    expect(state.paidPlan).toBe("premium");
-  });
-
-  it("limite le nombre de véhicules selon le plan effectif", () => {
-    const free = getUserPlanState(makeProfile(), now);
-    expect(free.maxVehicles).toBe(1);
-    const premium = getUserPlanState(
-      makeProfile({ dealer_premium_until: "2026-12-31T00:00:00Z" }),
-      now
-    );
-    expect(premium.maxVehicles).toBeGreaterThan(1);
   });
 });
 

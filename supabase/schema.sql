@@ -1,6 +1,6 @@
 -- ════════════════════════════════════════════════════════════════════════════
 -- RideCloudMoto — Schéma de base Supabase
--- Catégories : motos + scooters | Plans : free + premium | 1 an Premium offert
+-- Catégories : motos + scooters | Accès : code concessionnaire (gratuit 1 an) ou Premium
 -- ════════════════════════════════════════════════════════════════════════════
 
 -- ── Extensions ──────────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   mollie_customer_id       text,
   mollie_subscription_id   text,
   mollie_mandate_id        text,
-  -- Offre concessionnaire : Premium offert jusqu'à cette date (1 an par défaut)
+  -- Offre concessionnaire : accès gratuit (1 véhicule) jusqu'à cette date — activée via code
   dealer_premium_until     timestamptz,
   created_at               timestamptz NOT NULL DEFAULT now(),
   updated_at               timestamptz NOT NULL DEFAULT now()
@@ -229,12 +229,29 @@ CREATE POLICY storage_update_own ON storage.objects FOR UPDATE
 CREATE POLICY storage_delete_own ON storage.objects FOR DELETE
   USING (bucket_id = 'ridecloudmoto-files' AND (storage.foldername(name))[1] = auth.uid()::text);
 
--- ── Trigger création profil (avec 1 an Premium offert) ───────────────────────
+-- ── Codes activation concessionnaire ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.dealer_activation_codes (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code         text NOT NULL UNIQUE,
+  dealer_name  text,
+  used_by      uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  used_at      timestamptz,
+  expires_at   timestamptz,
+  created_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_dealer_codes_unused
+  ON public.dealer_activation_codes (code)
+  WHERE used_by IS NULL;
+
+ALTER TABLE public.dealer_activation_codes ENABLE ROW LEVEL SECURITY;
+
+-- ── Trigger création profil (sans offre automatique) ───────────────────────
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, dealer_premium_until)
-  VALUES (NEW.id, NEW.email, now() + interval '12 months')
+  INSERT INTO public.profiles (id, email)
+  VALUES (NEW.id, NEW.email)
   ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, updated_at = now();
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN

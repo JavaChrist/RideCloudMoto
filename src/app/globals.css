@@ -40,6 +40,18 @@
     --ring: 45 96% 50%;
 
     --radius: 0.75rem;
+
+    --header-bar-height: 3.5rem;
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --header-bar-height: 4rem;
+    }
   }
 
   .dark {
@@ -122,5 +134,16 @@
   /* Pastille/anneau lumineux autour d'une illustration */
   .ring-glow {
     box-shadow: 0 0 0 1px hsl(45 96% 52% / 0.35), 0 8px 24px -8px hsl(45 96% 50% / 0.4);
+  }
+  /* Encoches / Dynamic Island (iPhone, PWA) */
+  .safe-area-top {
+    padding-top: var(--safe-area-top);
+  }
+  .safe-area-x {
+    padding-left: var(--safe-area-left);
+    padding-right: var(--safe-area-right);
+  }
+  .header-spacer {
+    height: calc(var(--header-bar-height) + var(--safe-area-top));
   }
 }

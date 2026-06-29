@@ -20,7 +20,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
     .eq("id", user.id)
     .maybeSingle();
 
-  // Filet de sécurité : crée le profil + offre Premium si absent
+  // Filet de sécurité : crée le profil si absent (sans offre automatique)
   if (!profile) {
     try {
       const admin = createAdminClient();

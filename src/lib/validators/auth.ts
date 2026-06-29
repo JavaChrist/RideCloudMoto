@@ -1,4 +1,14 @@
 import { z } from "zod";
+import { isValidDealerActivationCode } from "@/lib/billing/dealer-activation";
+
+const optionalDealerCode = z
+  .string()
+  .max(32, "Code trop long")
+  .optional()
+  .or(z.literal(""))
+  .refine((v) => !v || isValidDealerActivationCode(v), {
+    message: "Format invalide (ex. AB-123-CD)",
+  });
 
 export const loginSchema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
@@ -15,6 +25,7 @@ export const registerSchema = z
       .regex(/[A-Z]/, "Au moins une majuscule")
       .regex(/[0-9]/, "Au moins un chiffre"),
     confirmPassword: z.string(),
+    dealerCode: optionalDealerCode,
     acceptCgu: z.literal(true, { message: "Vous devez accepter les CGU" }),
   })
   .refine((data) => data.password === data.confirmPassword, {

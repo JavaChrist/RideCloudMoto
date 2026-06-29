@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { SubscriptionSection } from "@/components/billing/subscription-section";
 import { PushNotificationsSection } from "@/components/notifications/push-notifications-section";
 import { DeleteAccountSection } from "@/components/account/delete-account-section";
@@ -48,7 +50,12 @@ export default async function SettingsPage() {
             {user!.email}
           </p>
           {isAdminEmail(user!.email) ? (
-            <p className="pt-1 text-xs font-medium text-primary">Compte administrateur</p>
+            <div className="space-y-2 pt-2">
+              <p className="text-xs font-medium text-primary">Compte administrateur</p>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/admin/dealer-codes">Codes concessionnaire</Link>
+              </Button>
+            </div>
           ) : null}
         </CardContent>
       </Card>

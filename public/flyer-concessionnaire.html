@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RideCloudMoto — Flyer concessionnaire</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --gold: #FACC15;
+      --gold-dark: #CA8A04;
+      --gold-light: #FEF9C3;
+      --ink: #0a0a0a;
+      --ink-soft: #171717;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --card: #ffffff;
+    }
+
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: #e2e8f0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .flyer {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: var(--card);
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 28px 36px 88px;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(250, 204, 21, 0.22), transparent 65%),
+        linear-gradient(160deg, #262626 0%, var(--ink) 42%, #1c1400 100%);
+      color: #fff;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--gold);
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .brand-name span { color: var(--gold); }
+
+    .brand-tagline {
+      font-size: 11px;
+      color: rgba(250, 204, 21, 0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.92);
+      white-space: nowrap;
+    }
+
+    .hero-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    .hero-title {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      max-width: 620px;
+      margin-bottom: 14px;
+    }
+
+    .hero-sub {
+      font-size: 14.5px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.78);
+      max-width: 580px;
+      margin-bottom: 22px;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 11.5px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .pill svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+
+    /* ── CTA card ── */
+    .cta-wrap {
+      padding: 0 36px;
+      margin-top: -56px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta-card {
+      display: grid;
+      grid-template-columns: 168px 1fr;
+      gap: 28px;
+      align-items: center;
+      padding: 24px 28px;
+      background: var(--card);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px rgba(15, 23, 42, 0.04), 0 20px 48px -16px rgba(15, 23, 42, 0.14);
+    }
+
+    .qr-box {
+      width: 168px;
+      height: 168px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      padding: 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .cta-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 6px;
+    }
+
+    .cta-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .cta-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 18px;
+      max-width: 420px;
+    }
+
+    .cta-desc strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .cta-code-box {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 2px dashed #fde68a;
+      background: #fef9c3;
+      text-align: left;
+    }
+    .cta-code-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #854d0e;
+      margin-bottom: 8px;
+    }
+    .cta-code-blank {
+      min-height: 44px;
+      border-bottom: 2px solid #ca8a04;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 4px;
+    }
+    .cta-code-example {
+      font-family: ui-monospace, monospace;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: #ca8a04;
+      opacity: 0.35;
+    }
+    .cta-steps {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .cta-step {
+      padding: 10px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+    .cta-step strong {
+      display: block;
+      color: var(--text);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    .cta-code-hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #92400e;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--gold) 0%, #EAB308 100%);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(250, 204, 21, 0.4);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* ── Features ── */
+    .features {
+      padding: 32px 36px 24px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .feature {
+      display: flex;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--gold-light);
+      border: 1px solid #fde68a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--gold-dark);
+    }
+
+    .feature-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .feature-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-text {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .feature-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fef9c3;
+      border: 1px solid #fde68a;
+      color: #854d0e;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Pricing ── */
+    .pricing {
+      padding: 8px 36px 28px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .plan {
+      padding: 18px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      text-align: center;
+    }
+
+    .plan.featured {
+      background: linear-gradient(160deg, #262626 0%, var(--ink) 100%);
+      border-color: var(--gold);
+      color: #fff;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(250, 204, 21, 0.22);
+    }
+
+    .plan-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .plan:not(.featured) .plan-tag {
+      background: #f1f5f9;
+      color: var(--muted);
+    }
+
+    .plan.featured .plan-tag {
+      background: var(--gold);
+      color: var(--ink);
+    }
+
+    .plan-name {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .plan-price {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .plan-price span {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.75;
+    }
+
+    .plan:not(.featured) .plan-price span { color: var(--muted); }
+    .plan.featured .plan-price span { color: rgba(255,255,255,0.7); }
+
+    .plan-detail {
+      font-size: 11.5px;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+
+    .plan:not(.featured) .plan-detail { color: var(--muted); }
+    .plan.featured .plan-detail { color: rgba(255,255,255,0.78); }
+
+    /* ── Dealer note ── */
+    .dealer-note {
+      margin: 0 36px 24px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: var(--gold-light);
+      border: 1px solid #fde68a;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .dealer-note-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--gold);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+
+    .dealer-note p {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #713f12;
+    }
+
+    .dealer-note strong {
+      display: block;
+      font-size: 13px;
+      color: #422006;
+      margin-bottom: 2px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 36px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .footer-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .footer-role {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .footer-links a {
+      color: var(--gold-dark);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .footer-links span {
+      color: var(--muted);
+    }
+
+    /* ── Print ── */
+    @media print {
+      html, body {
+        background: #fff;
+      }
+      .flyer {
+        box-shadow: none;
+        width: 210mm;
+        min-height: 297mm;
+      }
+      .btn-primary, .btn-secondary {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .hero, .plan.featured, .feature-icon, .dealer-note, .brand-mark, .btn-primary {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    @media screen and (max-width: 800px) {
+      .flyer { width: 100%; min-height: auto; }
+      .hero, .features, .pricing, .cta-wrap, .dealer-note, .footer { padding-left: 20px; padding-right: 20px; }
+      .dealer-note { margin-left: 20px; margin-right: 20px; }
+      .cta-card { grid-template-columns: 1fr; text-align: center; }
+      .qr-box { margin: 0 auto; }
+      .cta-actions { justify-content: center; }
+      .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+      .cta-steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <article class="flyer">
+    <!-- Hero -->
+    <header class="hero">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">RM</div>
+          <div>
+            <div class="brand-name">RideCloud<span>Moto</span></div>
+            <div class="brand-tagline">Le cloud de votre deux-roues</div>
+          </div>
+        </div>
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Offre concessionnaire
+        </div>
+      </div>
+
+      <h1 class="hero-title">La vie de votre deux-roues, enfin dans le cloud.</h1>
+      <p class="hero-sub">
+        Carnet d'entretien intelligent pour <strong style="color:#fff;font-weight:600">moto et scooter</strong>
+        — plan constructeur par modèle, suivi des coûts en temps réel et dossier exportable à la revente.
+        Hébergé en Europe, conçu en France.
+      </p>
+      <div class="hero-pills">
+        <span class="pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          Plan constructeur par modèle
+        </span>
+        <span class="pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          RGPD natif · Europe
+        </span>
+        <span class="pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Code d'activation · 12 mois
+        </span>
+      </div>
+    </header>
+
+    <!-- CTA -->
+    <section class="cta-wrap">
+      <div class="cta-card">
+        <div class="qr-box">
+          <img src="flyer-qr.svg" alt="QR code — ride-cloud-moto.vercel.app/register" width="148" height="148" />
+        </div>
+        <div>
+          <div class="cta-label">Offert par votre concessionnaire</div>
+          <h2 class="cta-title">Scannez. Installez. Roulez.</h2>
+          <p class="cta-desc">
+            <strong>Plan Gratuit offert 12 mois</strong> (1 véhicule) — activé avec le
+            <strong>code remis à la livraison</strong>, au format immatriculation
+            <strong>AB-123-CD</strong> (souvent la plaque de votre moto).
+            Sans code, seul l'abonnement Premium donne accès à l'application.
+          </p>
+          <div class="cta-code-box">
+            <div class="cta-code-label">Votre code d'activation</div>
+            <div class="cta-code-blank" aria-label="Zone à compléter par le concessionnaire"></div>
+            <p class="cta-code-hint">
+              Format <strong>AB-123-CD</strong> (souvent l'immatriculation) · inscrire au stylo à la livraison.
+              Le client saisit ce code à l'inscription ou dans Paramètres.
+            </p>
+          </div>
+          <div class="cta-steps">
+            <div class="cta-step">
+              <strong>1. Scannez</strong>
+              Le QR ou ouvrez ride-cloud-moto.vercel.app/register
+            </div>
+            <div class="cta-step">
+              <strong>2. Inscrivez-vous</strong>
+              Créez votre compte et saisissez le code
+            </div>
+            <div class="cta-step">
+              <strong>3. Roulez</strong>
+              Compte à rebours visible dans l'app jusqu'à la fin de l'offre
+            </div>
+          </div>
+          <div class="cta-actions" style="margin-top: 18px;">
+            <a class="btn-primary" href="https://ride-cloud-moto.vercel.app/register">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              Créer mon compte
+            </a>
+            <a class="btn-secondary" href="https://ride-cloud-moto.vercel.app">ride-cloud-moto.vercel.app</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+      <div class="features-grid">
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div>
+            <div class="feature-title">Plan d'entretien constructeur</div>
+            <p class="feature-text">Vidange, chaîne ou courroie CVT, plaquettes, liquides — échéances calculées selon votre modèle et votre usage.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div>
+            <div class="feature-title">Rappels intelligents</div>
+            <p class="feature-text">Notifications push avant chaque opération à prévoir. Fini les vidanges oubliées et les mauvaises surprises.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="feature-title">Fiche technique</div>
+            <p class="feature-text">Caractéristiques de votre modèle et lien vers la notice constructeur, toujours à portée de main.</p>
+            <span class="feature-badge">Constructeur</span>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <div class="feature-title">Suivi des coûts</div>
+            <p class="feature-text">KPI mensuel, annuel et au kilomètre. Visualisez enfin ce que votre deux-roues vous coûte vraiment.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <div>
+            <div class="feature-title">Dossier exportable</div>
+            <p class="feature-text">Export JSON, ZIP et PDF. Un historique propre et transférable pour valoriser votre moto à la revente.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div>
+            <div class="feature-title">PWA sans store</div>
+            <p class="feature-text">Installable en 3 secondes sur iPhone et Android. Aucun téléchargement depuis un store, zéro friction.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dealer note -->
+    <aside class="dealer-note">
+      <div class="dealer-note-icon" aria-hidden="true">🏍</div>
+      <p>
+        <strong>Pour les concessionnaires moto &amp; scooter</strong>
+        À la livraison : enregistrez l'immatriculation du véhicule dans l'admin
+        (<em>Codes concessionnaire</em>) ou générez des codes au format plaque.
+        Remettez ce flyer avec le code inscrit (ou l'étiquette QR imprimée).
+        L'offre Gratuit (1 véhicule, 12 mois) n'est <strong>pas automatique</strong> :
+        le client doit activer son code. Un compte à rebours dans l'app l'avertit
+        avant la fin de l'offre ; sans Premium ensuite, l'accès est suspendu.
+      </p>
+    </aside>
+
+    <!-- Pricing -->
+    <section class="pricing">
+      <div class="pricing-grid">
+        <div class="plan featured">
+          <div class="plan-tag">Offert à l'achat</div>
+          <div class="plan-name">GRATUIT</div>
+          <div class="plan-price">0 € <span>/ 12 mois</span></div>
+          <p class="plan-detail">1 véhicule · Plan d'entretien · Code requis · Compte à rebours in-app</p>
+        </div>
+        <div class="plan">
+          <div class="plan-tag">Après 12 mois</div>
+          <div class="plan-name">PREMIUM</div>
+          <div class="plan-price">3,99 € <span>/ mois</span></div>
+          <p class="plan-detail">Jusqu'à 20 véhicules · Push · Exports · Accès continu</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-author">
+        <img
+          class="footer-logo"
+          src="/logo_JavaChrist192.png"
+          alt="JavaChrist"
+          width="40"
+          height="40"
+        />
+        <div>
+          <div class="footer-name">JavaChrist — Christian Grohens</div>
+          <div class="footer-role">Freelance</div>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="https://ride-cloud-moto.vercel.app">ride-cloud-moto.vercel.app</a><br />
+        <span>support@javachrist.fr</span>
+      </div>
+    </footer>
+  </article>
+</body>
+</html>

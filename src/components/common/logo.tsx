@@ -5,23 +5,36 @@ import { cn } from "@/lib/utils";
 interface LogoProps {
   href?: string;
   showWordmark?: boolean;
+  /** Masque le texte sur petit écran (iPhone) pour éviter le débordement */
+  compactOnMobile?: boolean;
   size?: number;
   className?: string;
 }
 
-export function Logo({ href = "/categories", showWordmark = true, size = 36, className }: LogoProps) {
+export function Logo({
+  href = "/categories",
+  showWordmark = true,
+  compactOnMobile = false,
+  size = 36,
+  className,
+}: LogoProps) {
   const content = (
-    <span className={cn("inline-flex items-center gap-2", className)}>
+    <span className={cn("inline-flex min-w-0 items-center gap-1.5 sm:gap-2", className)}>
       <Image
         src="/logo192.png"
         alt="RideCloudMoto"
         width={size}
         height={size}
         priority
-        className="rounded-md"
+        className="shrink-0 rounded-md"
       />
       {showWordmark ? (
-        <span className="text-lg font-extrabold tracking-tight">
+        <span
+          className={cn(
+            "truncate text-base font-extrabold tracking-tight sm:text-lg",
+            compactOnMobile && "hidden min-[420px]:inline",
+          )}
+        >
           RideCloud<span className="text-primary">Moto</span>
         </span>
       ) : null}
