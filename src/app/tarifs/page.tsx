@@ -32,8 +32,8 @@ export default async function TarifsPage() {
 
   return (
     <div className="min-h-dvh">
-      <header className="border-b">
-        <div className="container flex h-16 items-center justify-between">
+      <header className="safe-area-top safe-area-x sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+        <div className="container flex h-14 min-h-[var(--header-bar-height)] items-center justify-between sm:h-16">
           <Logo href="/" />
           <Button variant="ghost" size="sm" asChild>
             <Link href={user ? "/categories" : "/"}>

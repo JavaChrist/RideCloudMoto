@@ -22,8 +22,8 @@ export function ProtectedHeader({
   dealerDaysLeft,
 }: ProtectedHeaderProps) {
   return (
-    <header className="safe-area-top safe-area-x fixed inset-x-0 top-0 z-40 border-b bg-background/80 backdrop-blur">
-      <div className="container flex h-14 items-center justify-between gap-2 sm:h-16 sm:gap-3">
+    <header className="safe-area-top safe-area-x fixed inset-x-0 top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="container flex h-14 min-h-[var(--header-bar-height)] items-center justify-between gap-2 sm:h-16 sm:gap-3">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Logo size={32} compactOnMobile />
           {hasAccess && isDealerOffer ? (

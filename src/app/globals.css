@@ -42,10 +42,11 @@
     --radius: 0.75rem;
 
     --header-bar-height: 3.5rem;
-    --safe-area-top: env(safe-area-inset-top, 0px);
-    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-    --safe-area-left: env(safe-area-inset-left, 0px);
-    --safe-area-right: env(safe-area-inset-right, 0px);
+    /* iOS : pas de fallback 0px dans env() — Safari l’utilise parfois à la place de la vraie inset */
+    --safe-area-top: 0px;
+    --safe-area-bottom: 0px;
+    --safe-area-left: 0px;
+    --safe-area-right: 0px;
   }
 
   @media (min-width: 640px) {
@@ -137,13 +138,35 @@
   }
   /* Encoches / Dynamic Island (iPhone, PWA) */
   .safe-area-top {
-    padding-top: var(--safe-area-top);
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top);
+    padding-top: max(0px, constant(safe-area-inset-top));
+    padding-top: max(0px, env(safe-area-inset-top));
   }
   .safe-area-x {
-    padding-left: var(--safe-area-left);
-    padding-right: var(--safe-area-right);
+    padding-left: constant(safe-area-inset-left);
+    padding-left: env(safe-area-inset-left);
+    padding-right: constant(safe-area-inset-right);
+    padding-right: env(safe-area-inset-right);
+  }
+  .safe-area-bottom {
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .header-spacer {
-    height: calc(var(--header-bar-height) + var(--safe-area-top));
+    height: var(--header-bar-height);
+    height: calc(var(--header-bar-height) + constant(safe-area-inset-top));
+    height: calc(var(--header-bar-height) + env(safe-area-inset-top));
+    height: calc(var(--header-bar-height) + max(0px, env(safe-area-inset-top)));
+  }
+}
+
+/* Variables safe-area pour calc() ailleurs dans l’app */
+@supports (padding: env(safe-area-inset-top)) {
+  :root {
+    --safe-area-top: env(safe-area-inset-top);
+    --safe-area-bottom: env(safe-area-inset-bottom);
+    --safe-area-left: env(safe-area-inset-left);
+    --safe-area-right: env(safe-area-inset-right);
   }
 }

@@ -19,7 +19,8 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    /* default = contenu sous la barre de statut (évite le chevauchement des icônes iOS) */
+    statusBarStyle: "default",
     title: "RideCloudMoto",
   },
   icons: {
