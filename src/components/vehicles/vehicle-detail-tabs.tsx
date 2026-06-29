@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import type {
   MaintenanceEntry,
   MaintenancePlanEntry,
@@ -13,6 +15,17 @@ import { HistorySections } from "@/components/history/history-sections";
 import { ModificationsList } from "@/components/modifications/modifications-list";
 import { DocumentsList } from "@/components/documents/documents-list";
 import { TechnicalSheet } from "@/components/vehicles/technical-sheet";
+import { cn } from "@/lib/utils";
+
+const SECTIONS = [
+  { value: "plan", label: "Plan" },
+  { value: "historique", label: "Historique" },
+  { value: "technique", label: "Fiche technique" },
+  { value: "modifs", label: "Accessoires" },
+  { value: "docs", label: "Documents" },
+] as const;
+
+type SectionValue = (typeof SECTIONS)[number]["value"];
 
 interface Props {
   vehicle: Vehicle;
@@ -35,14 +48,38 @@ export function VehicleDetailTabs({
   currentKm,
   isPremium,
 }: Props) {
+  const [tab, setTab] = useState<SectionValue>("plan");
+
   return (
-    <Tabs defaultValue="plan" className="w-full">
-      <TabsList className="grid w-full grid-cols-5">
-        <TabsTrigger value="plan">Plan</TabsTrigger>
-        <TabsTrigger value="historique">Historique</TabsTrigger>
-        <TabsTrigger value="technique">Fiche technique</TabsTrigger>
-        <TabsTrigger value="modifs">Accessoires</TabsTrigger>
-        <TabsTrigger value="docs">Documents</TabsTrigger>
+    <Tabs value={tab} onValueChange={(value) => setTab(value as SectionValue)} className="w-full">
+      <div className="relative md:hidden">
+        <select
+          value={tab}
+          onChange={(event) => setTab(event.target.value as SectionValue)}
+          className={cn(
+            "flex h-10 w-full appearance-none rounded-lg border border-input bg-background px-3 py-2 pr-10 text-sm font-medium shadow-sm",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          )}
+          aria-label="Section du véhicule"
+        >
+          {SECTIONS.map((section) => (
+            <option key={section.value} value={section.value}>
+              {section.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden
+        />
+      </div>
+
+      <TabsList className="hidden w-full md:grid md:grid-cols-5">
+        {SECTIONS.map((section) => (
+          <TabsTrigger key={section.value} value={section.value}>
+            {section.label}
+          </TabsTrigger>
+        ))}
       </TabsList>
 
       <TabsContent value="plan">
