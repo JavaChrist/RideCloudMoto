@@ -52,15 +52,26 @@ export function DealerOfferCountdown({
   className,
 }: DealerOfferCountdownProps) {
   const until = React.useMemo(() => new Date(expiresAt), [expiresAt]);
-  const [now, setNow] = React.useState(() => new Date());
+  const [now, setNow] = React.useState<Date | null>(null);
 
   React.useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000);
+    const tick = () => setNow(new Date());
+    tick();
+    const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, []);
 
-  const countdown = getDealerCountdown(until, now);
-  const urgency = getDealerUrgency(countdown.days);
+  if (until.getTime() <= 0) {
+    return null;
+  }
+
+  const countdown = now ? getDealerCountdown(until, now) : null;
+
+  if (countdown?.expired) {
+    return null;
+  }
+
+  const urgency = countdown ? getDealerUrgency(countdown.days) : "normal";
   const styles = URGENCY_STYLES[urgency];
 
   if (countdown.expired) {
@@ -116,7 +127,7 @@ function DealerCountdownContent({
   message,
   layout,
 }: {
-  countdown: ReturnType<typeof getDealerCountdown>;
+  countdown: ReturnType<typeof getDealerCountdown> | null;
   until: Date;
   styles: (typeof URGENCY_STYLES)[DealerUrgency];
   message: string;
@@ -142,17 +153,25 @@ function DealerCountdownContent({
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-1.5 font-mono tabular-nums">
-          {countdown.days > 0 ? (
+          {countdown ? (
             <>
-              <CountdownUnit value={countdown.days} label="j" styles={styles} wide />
+              {countdown.days > 0 ? (
+                <>
+                  <CountdownUnit value={countdown.days} label="j" styles={styles} wide />
+                  <span className="text-lg font-bold text-muted-foreground">:</span>
+                </>
+              ) : null}
+              <CountdownUnit value={countdown.hours} label="h" styles={styles} />
               <span className="text-lg font-bold text-muted-foreground">:</span>
+              <CountdownUnit value={countdown.minutes} label="m" styles={styles} />
+              <span className="text-lg font-bold text-muted-foreground">:</span>
+              <CountdownUnit value={countdown.seconds} label="s" styles={styles} />
             </>
-          ) : null}
-          <CountdownUnit value={countdown.hours} label="h" styles={styles} />
-          <span className="text-lg font-bold text-muted-foreground">:</span>
-          <CountdownUnit value={countdown.minutes} label="m" styles={styles} />
-          <span className="text-lg font-bold text-muted-foreground">:</span>
-          <CountdownUnit value={countdown.seconds} label="s" styles={styles} />
+          ) : (
+            <span className="text-sm text-muted-foreground" aria-hidden>
+              Chargement…
+            </span>
+          )}
         </div>
         <Button size="sm" asChild className="shrink-0">
           <Link href="/parametres">
@@ -163,7 +182,9 @@ function DealerCountdownContent({
       </div>
 
       <p className="sr-only" aria-live="polite">
-        {formatCountdownDisplay(countdown)} restants avant la fin de l&apos;offre gratuite
+        {countdown
+          ? `${formatCountdownDisplay(countdown)} restants avant la fin de l'offre gratuite`
+          : "Calcul du temps restant"}
       </p>
     </div>
   );
