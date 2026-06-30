@@ -69,7 +69,7 @@ export function LoginForm() {
     }
 
     toast.success("Connexion réussie.");
-    router.push("/categories");
+    router.push("/post-login");
     router.refresh();
   }
 

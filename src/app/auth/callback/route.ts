@@ -2,13 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureProfile } from "@/lib/billing/ensure-profile";
+import { isAdminEmail } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/categories";
+  const nextParam = searchParams.get("next");
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing_code`);
@@ -36,5 +37,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}${next}`);
+  // Si un `next` explicite est fourni, on le respecte ; sinon route selon le rôle.
+  const destination =
+    nextParam ?? (isAdminEmail(data.user?.email) ? "/admin/dealer-codes" : "/categories");
+
+  return NextResponse.redirect(`${origin}${destination}`);
 }
