@@ -74,10 +74,6 @@ export function DealerOfferCountdown({
   const urgency = countdown ? getDealerUrgency(countdown.days) : "normal";
   const styles = URGENCY_STYLES[urgency];
 
-  if (countdown.expired) {
-    return null;
-  }
-
   const message =
     urgency === "critical"
       ? "Votre offre se termine très bientôt — souscrivez au Premium pour garder l'accès."

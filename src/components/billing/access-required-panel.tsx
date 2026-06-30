@@ -35,7 +35,7 @@ export function AccessRequiredPanel() {
           <div className="space-y-3 text-center">
             <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Sparkles className="h-4 w-4 text-primary" />
-              Jusqu&apos;à 20 véhicules, notifications push et exports
+              Jusqu&apos;à 5 véhicules, notifications push et exports
             </p>
             <UpgradeButton className="w-full" label="Souscrire au Premium" />
             <Button variant="ghost" size="sm" asChild>

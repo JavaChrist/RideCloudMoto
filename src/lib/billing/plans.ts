@@ -37,9 +37,9 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
       monthly: { amount: 3.99, currency: "EUR", label: "3,99 €/mois" },
       yearly: { amount: 39.99, currency: "EUR", label: "39,99 €/an" },
     },
-    maxVehicles: 20,
+    maxVehicles: 5,
     features: [
-      "Jusqu'à 20 véhicules",
+      "Jusqu'à 5 véhicules",
       "Plan d'entretien constructeur",
       "Rappels automatiques + notifications push",
       "Fiches techniques & notices",

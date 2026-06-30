@@ -56,7 +56,7 @@ describe("getUserPlanState — offre concessionnaire", () => {
     const state = getUserPlanState(profile, now);
     expect(state.hasAccess).toBe(true);
     expect(state.effectivePlan).toBe("premium");
-    expect(state.maxVehicles).toBeGreaterThan(1);
+    expect(state.maxVehicles).toBe(5);
   });
 
   it("priorise Premium payant sur l'offre concessionnaire", () => {
