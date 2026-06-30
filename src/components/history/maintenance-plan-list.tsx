@@ -4,7 +4,7 @@ import * as React from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Circle, AlertTriangle, Clock } from "lucide-react";
 import type { MaintenancePlanEntry, Vehicle } from "@/types/database";
-import { getMaintenanceStatus, MAINTENANCE_STATUS_LABELS } from "@/lib/maintenance";
+import { getMaintenanceStatus, MAINTENANCE_STATUS_LABELS, compareMaintenanceByDue, MAINTENANCE_STATUS_SORT_ORDER } from "@/lib/maintenance";
 import { estimateCurrentKm } from "@/lib/odometer-estimate";
 import { formatDate } from "@/lib/utils/date";
 import { addMaintenanceEntry } from "@/app/(protected)/vehicule/[id]/actions";
@@ -42,8 +42,10 @@ export function MaintenancePlanList({ vehicle, planEntries }: Props) {
       }),
     }))
     .sort((a, b) => {
-      const order = { overdue: 0, due_soon: 1, upcoming: 2, done: 3 };
-      return order[a.status] - order[b.status];
+      const statusDiff =
+        MAINTENANCE_STATUS_SORT_ORDER[a.status] - MAINTENANCE_STATUS_SORT_ORDER[b.status];
+      if (statusDiff !== 0) return statusDiff;
+      return compareMaintenanceByDue(a.entry, b.entry, currentKm);
     });
 
   async function markDone(p: MaintenancePlanEntry) {
@@ -105,11 +107,12 @@ export function MaintenancePlanList({ vehicle, planEntries }: Props) {
               </div>
               <Button
                 size="sm"
-                variant="outline"
+                variant={status === "upcoming" ? "ghost" : "outline"}
                 disabled={pendingId === entry.id}
                 onClick={() => markDone(entry)}
+                aria-label={`Marquer « ${entry.titre} » comme effectué`}
               >
-                Fait
+                {status === "upcoming" ? "Anticiper" : "Effectuer"}
               </Button>
             </CardContent>
           </Card>

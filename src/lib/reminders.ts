@@ -1,5 +1,5 @@
 import type { MaintenancePlanEntry, UpcomingMaintenance, Vehicle } from "@/types/database";
-import { getMaintenanceStatus } from "@/lib/maintenance";
+import { getMaintenanceStatus, compareMaintenanceByDue } from "@/lib/maintenance";
 import { estimateCurrentKm } from "@/lib/odometer-estimate";
 
 export interface Reminder {
@@ -48,7 +48,11 @@ export function getVehicleReminders(
     }))
     .sort((a, b) => {
       if (a.status !== b.status) return a.status === "overdue" ? -1 : 1;
-      return 0;
+      return compareMaintenanceByDue(
+        { next_due_km: a.nextDueKm, next_due_date: a.nextDueDate },
+        { next_due_km: b.nextDueKm, next_due_date: b.nextDueDate },
+        currentKm
+      );
     });
 }
 

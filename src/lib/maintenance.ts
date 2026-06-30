@@ -94,6 +94,36 @@ export function getMaintenanceStatus(input: StatusInput): MaintenanceStatus {
   return "upcoming";
 }
 
+/** Tri par échéance la plus proche (km puis date). */
+export function compareMaintenanceByDue(
+  a: { next_due_km: number | null; next_due_date: string | null },
+  b: { next_due_km: number | null; next_due_date: string | null },
+  currentKm: number
+): number {
+  const kmRemaining = (nextDueKm: number | null) =>
+    nextDueKm != null ? nextDueKm - currentKm : null;
+
+  const kmA = kmRemaining(a.next_due_km);
+  const kmB = kmRemaining(b.next_due_km);
+
+  if (kmA != null && kmB != null && kmA !== kmB) return kmA - kmB;
+  if (kmA != null && kmB == null) return -1;
+  if (kmA == null && kmB != null) return 1;
+
+  const dateA = a.next_due_date ? new Date(a.next_due_date).getTime() : Number.POSITIVE_INFINITY;
+  const dateB = b.next_due_date ? new Date(b.next_due_date).getTime() : Number.POSITIVE_INFINITY;
+  if (dateA !== dateB) return dateA - dateB;
+
+  return 0;
+}
+
+export const MAINTENANCE_STATUS_SORT_ORDER: Record<MaintenanceStatus, number> = {
+  overdue: 0,
+  due_soon: 1,
+  upcoming: 2,
+  done: 3,
+};
+
 export const MAINTENANCE_STATUS_LABELS: Record<MaintenanceStatus, string> = {
   upcoming: "À venir",
   due_soon: "Bientôt",
