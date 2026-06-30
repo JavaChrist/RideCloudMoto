@@ -23,6 +23,17 @@ export function getSiteUrl(): string {
   );
 }
 
+/**
+ * Origin pour les redirections Supabase Auth côté navigateur.
+ * Utilise le domaine courant pour éviter un localhost figé au build.
+ */
+export function getAuthRedirectOrigin(): string {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return getSiteUrl();
+}
+
 /** URL publique pour QR codes, liens d'inscription et documents client. */
 export function getPublicSiteUrl(): string {
   const production = "https://ride-cloud-moto.vercel.app";

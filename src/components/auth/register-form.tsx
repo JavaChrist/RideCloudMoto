@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { registerSchema, type RegisterInput } from "@/lib/validators/auth";
-import { getSiteUrl } from "@/lib/supabase/env";
+import { getAuthRedirectOrigin } from "@/lib/supabase/env";
 import {
   Card,
   CardContent,
@@ -64,7 +64,7 @@ export function RegisterForm({ initialDealerCode = "" }: RegisterFormProps) {
           full_name: values.fullName,
           ...(dealerCode ? { dealer_activation_code: dealerCode } : {}),
         },
-        emailRedirectTo: `${getSiteUrl()}/auth/callback`,
+        emailRedirectTo: `${getAuthRedirectOrigin()}/auth/callback`,
       },
     });
 
