@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureProfile } from "@/lib/billing/ensure-profile";
 import { ProtectedShell } from "@/components/layout/protected-shell";
+import { isAdminEmail } from "@/lib/admin";
 import type { Profile } from "@/types/database";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -36,8 +37,14 @@ export default async function ProtectedLayout({ children }: { children: React.Re
     }
   }
 
+  const isAdmin = isAdminEmail(user.email);
+
   return (
-    <ProtectedShell profile={(profile as Profile) ?? null} email={user.email ?? ""}>
+    <ProtectedShell
+      profile={(profile as Profile) ?? null}
+      email={user.email ?? ""}
+      isAdmin={isAdmin}
+    >
       {children}
     </ProtectedShell>
   );

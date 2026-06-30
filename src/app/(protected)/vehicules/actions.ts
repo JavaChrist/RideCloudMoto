@@ -7,6 +7,7 @@ import { getUserPlanState } from "@/lib/billing/limits";
 import { avgKmPerYear } from "@/lib/usage-profile";
 import { vehicleFormSchema } from "@/lib/validators/vehicle";
 import { BRAND_INTERNAL } from "@/lib/data/vehicle-catalog";
+import { isAdminEmail } from "@/lib/admin";
 import type { Profile, UsageProfile, Vehicle, VehicleCategory } from "@/types/database";
 
 export interface ActionResult {
@@ -42,8 +43,9 @@ export async function createVehicle(input: unknown): Promise<ActionResult> {
     profile = refetch.data;
   }
   const state = getUserPlanState(profile as Profile);
+  const isAdmin = isAdminEmail(user.email);
 
-  if (!state.hasAccess) {
+  if (!state.hasAccess && !isAdmin) {
     return {
       ok: false,
       error: "Activez votre code concessionnaire ou souscrivez au Premium pour ajouter un véhicule.",
@@ -55,7 +57,7 @@ export async function createVehicle(input: unknown): Promise<ActionResult> {
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id);
 
-  if ((count ?? 0) >= state.maxVehicles) {
+  if (!isAdmin && (count ?? 0) >= state.maxVehicles) {
     return {
       ok: false,
       error:

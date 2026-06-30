@@ -7,11 +7,13 @@ import { ProtectedHeader } from "./protected-header";
 interface ProtectedShellProps {
   profile: Profile | null;
   email: string;
+  isAdmin?: boolean;
   children: React.ReactNode;
 }
 
-export function ProtectedShell({ profile, children }: ProtectedShellProps) {
+export function ProtectedShell({ profile, isAdmin = false, children }: ProtectedShellProps) {
   const state = profile ? getUserPlanState(profile) : null;
+  const effectiveAccess = !!state?.hasAccess || isAdmin;
 
   const showDealerCountdown =
     state?.hasAccess &&
@@ -23,7 +25,7 @@ export function ProtectedShell({ profile, children }: ProtectedShellProps) {
       <ProtectedHeader
         isPremium={state?.effectivePlan === "premium"}
         isDealerOffer={!!state?.isDealerOffer}
-        hasAccess={!!state?.hasAccess}
+        hasAccess={effectiveAccess}
         dealerDaysLeft={state?.dealerDaysLeft ?? null}
       />
       <div className="header-spacer" aria-hidden />
@@ -34,7 +36,9 @@ export function ProtectedShell({ profile, children }: ProtectedShellProps) {
         />
       ) : null}
       <main className="container py-6">
-        <PaywallGate hasAccess={!!state?.hasAccess}>{children}</PaywallGate>
+        <PaywallGate hasAccess={!!state?.hasAccess} isAdmin={isAdmin}>
+          {children}
+        </PaywallGate>
       </main>
     </div>
   );
