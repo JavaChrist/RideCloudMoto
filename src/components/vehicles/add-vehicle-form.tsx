@@ -229,7 +229,14 @@ export function AddVehicleForm({
             </div>
             <div className="space-y-2">
               <Label htmlFor="kilometrage">Kilométrage</Label>
-              <Input id="kilometrage" name="kilometrage" type="number" min={0} defaultValue={0} required />
+              <Input
+                id="kilometrage"
+                name="kilometrage"
+                type="number"
+                min={0}
+                placeholder="Ex. 12500"
+                required
+              />
             </div>
           </div>
 

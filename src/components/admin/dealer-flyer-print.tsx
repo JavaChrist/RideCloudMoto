@@ -40,7 +40,7 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
         </Button>
       </div>
 
-      <article className="mx-auto w-[210mm] overflow-hidden bg-white shadow-xl print:shadow-none">
+      <article className="mx-auto w-[210mm] overflow-hidden bg-white text-neutral-900 shadow-xl print:bg-white print:text-neutral-900 print:shadow-none">
         <header className="bg-gradient-to-br from-neutral-800 via-neutral-950 to-amber-950 px-9 pb-20 pt-8 text-white">
           <div className="mb-8 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -74,7 +74,7 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
         </header>
 
         <section className="-mt-14 px-9">
-          <div className="grid grid-cols-[160px_1fr] gap-6 rounded-2xl border bg-white p-6 shadow-lg">
+          <div className="grid grid-cols-[160px_1fr] gap-6 rounded-2xl border bg-white p-6 text-neutral-900 shadow-lg">
             {qrUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={qrUrl} alt="QR inscription" width={148} height={148} className="rounded-xl border" />
@@ -90,8 +90,10 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
               <p className="text-xs font-bold uppercase tracking-wider text-amber-700">
                 Offert par votre concessionnaire
               </p>
-              <h2 className="mt-1 text-2xl font-extrabold">Scannez. Installez. Roulez.</h2>
-              <p className="mt-2 text-sm text-neutral-600">
+              <h2 className="mt-1 text-2xl font-extrabold text-neutral-950">
+                Scannez. Installez. Roulez.
+              </h2>
+              <p className="mt-2 text-sm text-neutral-700">
                 Plan Gratuit 12 mois · 1 véhicule · Plan d&apos;entretien complet
               </p>
               <div className="mt-4 rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 px-4 py-3">
@@ -102,7 +104,7 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
                   {formatDealerCodeDisplay(code)}
                 </p>
               </div>
-              <p className="mt-3 break-all text-xs text-neutral-400">{registerUrl}</p>
+              <p className="mt-3 break-all text-xs text-neutral-500">{registerUrl}</p>
             </div>
           </div>
         </section>
@@ -115,14 +117,14 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
               "Fiche technique",
               "Suivi des coûts",
             ].map((f) => (
-              <div key={f} className="rounded-lg border bg-neutral-50 p-3 font-medium">
+              <div key={f} className="rounded-lg border bg-neutral-50 p-3 font-medium text-neutral-800">
                 {f}
               </div>
             ))}
           </div>
         </section>
 
-        <footer className="border-t px-9 py-5 text-center text-xs text-neutral-500">
+        <footer className="border-t px-9 py-5 text-center text-xs text-neutral-600">
           ride-cloud-moto.vercel.app · support@javachrist.fr
         </footer>
       </article>
