@@ -42,6 +42,7 @@ export function ProtectedHeader({
               <Settings className="h-5 w-5" />
             </Link>
           </Button>
+          <SignOutButton iconOnly className="h-9 w-9 sm:hidden" />
           <SignOutButton className="hidden sm:inline-flex" />
         </nav>
       </div>

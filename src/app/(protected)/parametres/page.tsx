@@ -9,6 +9,7 @@ import { SubscriptionSection } from "@/components/billing/subscription-section";
 import { PushNotificationsSection } from "@/components/notifications/push-notifications-section";
 import { DeleteAccountSection } from "@/components/account/delete-account-section";
 import { BillingSuccessHandler } from "@/components/billing/billing-success-handler";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import type { Profile } from "@/types/database";
 
 export const metadata: Metadata = { title: "Paramètres" };
@@ -57,6 +58,9 @@ export default async function SettingsPage() {
               </Button>
             </div>
           ) : null}
+          <div className="pt-3">
+            <SignOutButton />
+          </div>
         </CardContent>
       </Card>
 

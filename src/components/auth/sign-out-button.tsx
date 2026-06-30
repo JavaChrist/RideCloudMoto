@@ -6,7 +6,13 @@ import { LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
-export function SignOutButton({ className }: { className?: string }) {
+export function SignOutButton({
+  className,
+  iconOnly,
+}: {
+  className?: string;
+  iconOnly?: boolean;
+}) {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
 
@@ -19,9 +25,16 @@ export function SignOutButton({ className }: { className?: string }) {
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={handleSignOut} disabled={loading} className={className}>
+    <Button
+      variant="ghost"
+      size={iconOnly ? "icon" : "sm"}
+      onClick={handleSignOut}
+      disabled={loading}
+      className={className}
+      aria-label="Déconnexion"
+    >
       <LogOut className="h-4 w-4" />
-      Déconnexion
+      {!iconOnly ? " Déconnexion" : null}
     </Button>
   );
 }
