@@ -32,7 +32,9 @@ export async function GET(request: Request) {
   const admin = createAdminClient();
   let query = admin
     .from("dealer_activation_codes")
-    .select("id, code, dealer_name, used_by, used_at, expires_at, created_at")
+    .select(
+      "id, code, dealer_name, customer_first_name, customer_last_name, customer_email, customer_phone, vehicle_model, purchase_date, used_by, used_at, expires_at, created_at"
+    )
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -74,16 +76,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
-  let body: { dealerName?: string; plate?: string };
+  let body: {
+    dealerName?: string;
+    plate?: string;
+    customerFirstName?: string;
+    customerLastName?: string;
+    customerEmail?: string;
+    customerPhone?: string;
+    vehicleModel?: string;
+    purchaseDate?: string;
+  };
   try {
     body = await request.json();
   } catch {
     body = {};
   }
 
-  const dealerName = body.dealerName?.trim() || null;
   const plate = body.plate?.trim();
-
   if (!plate) {
     return NextResponse.json(
       { error: "Immatriculation requise." },
@@ -92,10 +101,18 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient();
-  const result = await registerPlateAsDealerCode(admin, plate, dealerName);
+  const result = await registerPlateAsDealerCode(admin, plate, {
+    dealerName: body.dealerName,
+    customerFirstName: body.customerFirstName,
+    customerLastName: body.customerLastName,
+    customerEmail: body.customerEmail,
+    customerPhone: body.customerPhone,
+    vehicleModel: body.vehicleModel,
+    purchaseDate: body.purchaseDate,
+  });
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  return NextResponse.json({ codes: [result.code], dealerName, plate: true });
+  return NextResponse.json({ codes: [result.code], plate: true });
 }

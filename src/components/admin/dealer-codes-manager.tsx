@@ -5,6 +5,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import {
   Copy,
+  Download,
   ExternalLink,
   Loader2,
   Printer,
@@ -28,6 +29,12 @@ interface DealerCodesManagerProps {
 export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
   const [dealerName, setDealerName] = React.useState("");
   const [plateInput, setPlateInput] = React.useState("");
+  const [customerFirstName, setCustomerFirstName] = React.useState("");
+  const [customerLastName, setCustomerLastName] = React.useState("");
+  const [customerEmail, setCustomerEmail] = React.useState("");
+  const [customerPhone, setCustomerPhone] = React.useState("");
+  const [vehicleModel, setVehicleModel] = React.useState("");
+  const [purchaseDate, setPurchaseDate] = React.useState("");
   const [registeringPlate, setRegisteringPlate] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unused" | "used">("unused");
@@ -81,6 +88,12 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
         body: JSON.stringify({
           plate: plateInput.trim(),
           dealerName: dealerName.trim(),
+          customerFirstName: customerFirstName.trim(),
+          customerLastName: customerLastName.trim(),
+          customerEmail: customerEmail.trim(),
+          customerPhone: customerPhone.trim(),
+          vehicleModel: vehicleModel.trim(),
+          purchaseDate: purchaseDate || null,
         }),
       });
       const data = await res.json();
@@ -90,13 +103,20 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
       }
       const code = data.codes[0] as string;
       toast.success(`Immatriculation ${formatDealerCodeDisplay(code)} enregistrée`);
+      const registeredDealerName = dealerName.trim();
       setPlateInput("");
+      setCustomerFirstName("");
+      setCustomerLastName("");
+      setCustomerEmail("");
+      setCustomerPhone("");
+      setVehicleModel("");
+      setPurchaseDate("");
       setSelected(new Set([code]));
       await loadCodes();
       openPrintSheet([
         {
           code,
-          dealerName: dealerName.trim(),
+          dealerName: registeredDealerName,
           registerUrl: buildRegisterUrl(code, siteUrl),
         },
       ]);
@@ -105,6 +125,12 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
     } finally {
       setRegisteringPlate(false);
     }
+  }
+
+  function handleExportCsv() {
+    const params = new URLSearchParams({ status: filterStatus });
+    if (filterDealer) params.set("dealer", filterDealer);
+    window.location.href = `/api/admin/dealer-codes/export?${params}`;
   }
 
   function openPrintSheet(
@@ -157,47 +183,119 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
           <CardHeader>
             <CardTitle className="text-base">Enregistrer un véhicule livré</CardTitle>
             <CardDescription>
-              Le numéro d&apos;immatriculation du véhicule livré devient le code d&apos;activation.
-              Le client saisira la même plaque dans l&apos;application pour bénéficier de 12 mois
-              gratuits. Format SIV attendu : <strong>AB-123-CD</strong>.
+              Le numéro d&apos;immatriculation devient le code d&apos;activation. Le client saisira
+              la même plaque dans l&apos;application pour bénéficier de 12 mois gratuits.
+              Format SIV : <strong>AB-123-CD</strong>.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleRegisterPlate} className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="dealer-name">Point de vente / concessionnaire</Label>
-                <Input
-                  id="dealer-name"
-                  placeholder="Ex. Voge Moto Lyon"
-                  value={dealerName}
-                  onChange={(e) => setDealerName(e.target.value)}
-                  list="dealer-suggestions"
-                />
-                <datalist id="dealer-suggestions">
-                  {dealers.map((d) => (
-                    <option key={d} value={d} />
-                  ))}
-                </datalist>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="plate-input">Immatriculation du véhicule livré</Label>
-                <Input
-                  id="plate-input"
-                  placeholder="Ex. AB-123-CD"
-                  value={plateInput}
-                  onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
-                  className="font-mono uppercase tracking-wider"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <Button type="submit" disabled={registeringPlate}>
-                  {registeringPlate ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Enregistrer l'immatriculation"
-                  )}
-                </Button>
-              </div>
+            <form onSubmit={handleRegisterPlate} className="space-y-6">
+              <section className="grid gap-4 sm:grid-cols-2">
+                <h3 className="sm:col-span-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Véhicule & concessionnaire
+                </h3>
+                <div className="space-y-2">
+                  <Label htmlFor="dealer-name">Point de vente / concessionnaire *</Label>
+                  <Input
+                    id="dealer-name"
+                    placeholder="Ex. Voge Moto Lyon"
+                    value={dealerName}
+                    onChange={(e) => setDealerName(e.target.value)}
+                    list="dealer-suggestions"
+                    required
+                  />
+                  <datalist id="dealer-suggestions">
+                    {dealers.map((d) => (
+                      <option key={d} value={d} />
+                    ))}
+                  </datalist>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="plate-input">Immatriculation *</Label>
+                  <Input
+                    id="plate-input"
+                    placeholder="Ex. AB-123-CD"
+                    value={plateInput}
+                    onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
+                    className="font-mono uppercase tracking-wider"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vehicle-model">Modèle du véhicule</Label>
+                  <Input
+                    id="vehicle-model"
+                    placeholder="Ex. Voge 525 DS"
+                    value={vehicleModel}
+                    onChange={(e) => setVehicleModel(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="purchase-date">Date d&apos;achat</Label>
+                  <Input
+                    id="purchase-date"
+                    type="date"
+                    value={purchaseDate}
+                    onChange={(e) => setPurchaseDate(e.target.value)}
+                  />
+                </div>
+              </section>
+
+              <section className="grid gap-4 sm:grid-cols-2">
+                <h3 className="sm:col-span-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Client
+                </h3>
+                <div className="space-y-2">
+                  <Label htmlFor="customer-first-name">Prénom</Label>
+                  <Input
+                    id="customer-first-name"
+                    placeholder="Jean"
+                    value={customerFirstName}
+                    onChange={(e) => setCustomerFirstName(e.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customer-last-name">Nom</Label>
+                  <Input
+                    id="customer-last-name"
+                    placeholder="Dupont"
+                    value={customerLastName}
+                    onChange={(e) => setCustomerLastName(e.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customer-email">E-mail</Label>
+                  <Input
+                    id="customer-email"
+                    type="email"
+                    placeholder="jean.dupont@exemple.fr"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customer-phone">Téléphone</Label>
+                  <Input
+                    id="customer-phone"
+                    type="tel"
+                    placeholder="06 12 34 56 78"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+              </section>
+
+              <Button type="submit" disabled={registeringPlate}>
+                {registeringPlate ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Enregistrer la fiche"
+                )}
+              </Button>
             </form>
           </CardContent>
         </Card>
@@ -205,11 +303,22 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
         <Card>
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <CardTitle className="text-base">Codes existants</CardTitle>
-              <Button variant="ghost" size="sm" onClick={loadCodes} disabled={loading}>
-                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                Actualiser
-              </Button>
+              <CardTitle className="text-base">Fiches enregistrées</CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCsv}
+                  disabled={loading || codes.length === 0}
+                >
+                  <Download className="h-4 w-4" />
+                  Exporter (CSV)
+                </Button>
+                <Button variant="ghost" size="sm" onClick={loadCodes} disabled={loading}>
+                  <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+                  Actualiser
+                </Button>
+              </div>
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
               {(["all", "unused", "used"] as const).map((s) => (
@@ -257,14 +366,17 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
                   </div>
                 ) : null}
                 <div className="overflow-x-auto rounded-lg border">
-                  <table className="w-full min-w-[640px] text-sm">
+                  <table className="w-full min-w-[1000px] text-sm">
                     <thead className="border-b bg-muted/40 text-left">
                       <tr>
                         <th className="p-3 w-10" />
-                        <th className="p-3">Code</th>
+                        <th className="p-3">Immatriculation</th>
+                        <th className="p-3">Client</th>
+                        <th className="p-3">Contact</th>
+                        <th className="p-3">Modèle</th>
                         <th className="p-3">Concessionnaire</th>
+                        <th className="p-3">Date d&apos;achat</th>
                         <th className="p-3">Statut</th>
-                        <th className="p-3">Créé le</th>
                         <th className="p-3 text-right">Actions</th>
                       </tr>
                     </thead>
@@ -272,8 +384,11 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
                       {codes.map((row) => {
                         const registerUrl = buildRegisterUrl(row.code, siteUrl);
                         const isUsed = !!row.used_by;
+                        const customerName = [row.customer_first_name, row.customer_last_name]
+                          .filter(Boolean)
+                          .join(" ");
                         return (
-                          <tr key={row.id} className="border-b last:border-0">
+                          <tr key={row.id} className="border-b last:border-0 align-top">
                             <td className="p-3">
                               <input
                                 type="checkbox"
@@ -286,16 +401,29 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
                             <td className="p-3 font-mono font-semibold tracking-wider">
                               {formatDealerCodeDisplay(row.code)}
                             </td>
+                            <td className="p-3">{customerName || "—"}</td>
+                            <td className="p-3 text-xs">
+                              {row.customer_email ? (
+                                <div className="break-all">{row.customer_email}</div>
+                              ) : null}
+                              {row.customer_phone ? (
+                                <div className="text-muted-foreground">{row.customer_phone}</div>
+                              ) : null}
+                              {!row.customer_email && !row.customer_phone ? "—" : null}
+                            </td>
+                            <td className="p-3">{row.vehicle_model ?? "—"}</td>
                             <td className="p-3">{row.dealer_name ?? "—"}</td>
+                            <td className="p-3 text-muted-foreground">
+                              {row.purchase_date
+                                ? new Date(row.purchase_date).toLocaleDateString("fr-FR")
+                                : "—"}
+                            </td>
                             <td className="p-3">
                               {isUsed ? (
                                 <Badge variant="secondary">Utilisé</Badge>
                               ) : (
                                 <Badge variant="default">Disponible</Badge>
                               )}
-                            </td>
-                            <td className="p-3 text-muted-foreground">
-                              {new Date(row.created_at).toLocaleDateString("fr-FR")}
                             </td>
                             <td className="p-3">
                               <div className="flex justify-end gap-1">

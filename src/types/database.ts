@@ -138,6 +138,12 @@ export interface DealerActivationCode {
   id: string;
   code: string;
   dealer_name: string | null;
+  customer_first_name: string | null;
+  customer_last_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+  vehicle_model: string | null;
+  purchase_date: string | null;
   used_by: string | null;
   used_at: string | null;
   expires_at: string | null;

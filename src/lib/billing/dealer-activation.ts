@@ -111,14 +111,40 @@ export async function redeemDealerActivationCode(
   return { ok: true, until: untilIso };
 }
 
+export interface DealerCodeCustomerInfo {
+  dealerName?: string | null;
+  customerFirstName?: string | null;
+  customerLastName?: string | null;
+  customerEmail?: string | null;
+  customerPhone?: string | null;
+  vehicleModel?: string | null;
+  purchaseDate?: string | null; // YYYY-MM-DD
+}
+
+function toDbColumns(info: DealerCodeCustomerInfo) {
+  const clean = (v?: string | null) => {
+    const t = v?.trim();
+    return t ? t : null;
+  };
+  return {
+    dealer_name: clean(info.dealerName),
+    customer_first_name: clean(info.customerFirstName),
+    customer_last_name: clean(info.customerLastName),
+    customer_email: clean(info.customerEmail)?.toLowerCase() ?? null,
+    customer_phone: clean(info.customerPhone),
+    vehicle_model: clean(info.vehicleModel),
+    purchase_date: clean(info.purchaseDate),
+  };
+}
+
 /**
- * Enregistre un code à partir d'une immatriculation (livraison moto).
- * Retourne le code normalisé ou une erreur si format / doublon.
+ * Enregistre un code à partir d'une immatriculation (livraison moto) avec
+ * les informations client/véhicule fournies par le concessionnaire.
  */
 export async function registerPlateAsDealerCode(
   admin: SupabaseClient,
   rawPlate: string,
-  dealerName: string | null
+  info: DealerCodeCustomerInfo
 ): Promise<{ ok: true; code: string } | { ok: false; error: string }> {
   const code = normalizeDealerCode(rawPlate);
   if (!isFrenchPlateDealerCode(code)) {
@@ -127,6 +153,8 @@ export async function registerPlateAsDealerCode(
       error: "Immatriculation invalide. Format attendu : AB-123-CD.",
     };
   }
+
+  const columns = toDbColumns(info);
 
   const { data: existing } = await admin
     .from("dealer_activation_codes")
@@ -138,12 +166,19 @@ export async function registerPlateAsDealerCode(
     if (existing.used_by) {
       return { ok: false, error: "Cette immatriculation a déjà été utilisée comme code." };
     }
+    const { error } = await admin
+      .from("dealer_activation_codes")
+      .update(columns)
+      .eq("id", existing.id);
+    if (error) {
+      return { ok: false, error: "Impossible de mettre à jour cette fiche." };
+    }
     return { ok: true, code };
   }
 
   const { error } = await admin.from("dealer_activation_codes").insert({
     code,
-    dealer_name: dealerName,
+    ...columns,
   });
 
   if (error) {
