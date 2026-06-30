@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdminEmail } from "@/lib/admin";
-import { generateDealerActivationCode, registerPlateAsDealerCode } from "@/lib/billing/dealer-activation";
+import { registerPlateAsDealerCode } from "@/lib/billing/dealer-activation";
 
 export const dynamic = "force-dynamic";
 
@@ -67,14 +67,14 @@ export async function GET(request: Request) {
   return NextResponse.json({ codes: codes ?? [], dealers });
 }
 
-/** Génère des codes d'activation concessionnaire (admin). */
+/** Enregistre un code à partir de l'immatriculation du véhicule livré (admin). */
 export async function POST(request: Request) {
   const user = await requireAdmin();
   if (!user) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
-  let body: { count?: number; dealerName?: string; plate?: string };
+  let body: { dealerName?: string; plate?: string };
   try {
     body = await request.json();
   } catch {
@@ -82,38 +82,20 @@ export async function POST(request: Request) {
   }
 
   const dealerName = body.dealerName?.trim() || null;
+  const plate = body.plate?.trim();
+
+  if (!plate) {
+    return NextResponse.json(
+      { error: "Immatriculation requise." },
+      { status: 400 }
+    );
+  }
+
   const admin = createAdminClient();
-
-  // Code = immatriculation du véhicule livré
-  if (body.plate?.trim()) {
-    const result = await registerPlateAsDealerCode(admin, body.plate, dealerName);
-    if (!result.ok) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
-    return NextResponse.json({ codes: [result.code], dealerName, plate: true });
+  const result = await registerPlateAsDealerCode(admin, plate, dealerName);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  const count = Math.min(Math.max(body.count ?? 1, 1), 50);
-  const codes: string[] = [];
-
-  for (let i = 0; i < count; i++) {
-    let inserted = false;
-    for (let attempt = 0; attempt < 5 && !inserted; attempt++) {
-      const code = generateDealerActivationCode();
-      const { error } = await admin.from("dealer_activation_codes").insert({
-        code,
-        dealer_name: dealerName,
-      });
-      if (!error) {
-        codes.push(code);
-        inserted = true;
-      }
-    }
-  }
-
-  if (codes.length === 0) {
-    return NextResponse.json({ error: "Impossible de générer les codes" }, { status: 500 });
-  }
-
-  return NextResponse.json({ codes, dealerName });
+  return NextResponse.json({ codes: [result.code], dealerName, plate: true });
 }

@@ -2,9 +2,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 const DEALER_FREE_MONTHS = Number(process.env.DEALER_FREE_PREMIUM_MONTHS ?? 12);
 
-/** Lettres autorisées sur les plaques SIV françaises (hors I, O, U). */
-const PLATE_LETTERS = "ABCDEFGHJKLMNPQRSTVWXYZ";
-
 /** Code normalisé : 2 lettres + 3 chiffres + 2 lettres (ex. AB123CD). */
 export const PLATE_CODE_REGEX = /^[A-HJ-NP-TV-Z]{2}\d{3}[A-HJ-NP-TV-Z]{2}$/;
 
@@ -25,33 +22,9 @@ export function isFrenchPlateDealerCode(raw: string): boolean {
   return PLATE_CODE_REGEX.test(normalizeDealerCode(raw));
 }
 
-/** Accepte le format plaque SIV ou d'anciens codes alphanumériques (rétrocompatibilité). */
+/** Le code d'activation est désormais une immatriculation SIV. */
 export function isValidDealerActivationCode(raw: string): boolean {
-  const n = normalizeDealerCode(raw);
-  if (!n) return false;
-  if (PLATE_CODE_REGEX.test(n)) return true;
-  return /^[A-Z0-9]{6,12}$/.test(n);
-}
-
-function randomPlateLetter(): string {
-  return PLATE_LETTERS[Math.floor(Math.random() * PLATE_LETTERS.length)]!;
-}
-
-function randomPlateDigit(): string {
-  return String(Math.floor(Math.random() * 10));
-}
-
-/** Génère un code au format immatriculation SIV : AA-123-BB (stocké sans tirets). */
-export function generateDealerActivationCode(): string {
-  return (
-    randomPlateLetter() +
-    randomPlateLetter() +
-    randomPlateDigit() +
-    randomPlateDigit() +
-    randomPlateDigit() +
-    randomPlateLetter() +
-    randomPlateLetter()
-  );
+  return isFrenchPlateDealerCode(raw);
 }
 
 export type RedeemResult =
@@ -71,7 +44,7 @@ export async function redeemDealerActivationCode(
   if (!isValidDealerActivationCode(code)) {
     return {
       ok: false,
-      error: "Code invalide. Utilisez le format immatriculation (ex. AB-123-CD).",
+      error: "Immatriculation invalide. Format attendu : AB-123-CD.",
     };
   }
 

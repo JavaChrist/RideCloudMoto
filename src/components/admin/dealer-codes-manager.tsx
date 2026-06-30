@@ -8,7 +8,6 @@ import {
   ExternalLink,
   Loader2,
   Printer,
-  QrCode,
   RefreshCw,
   FileImage,
 } from "lucide-react";
@@ -29,8 +28,6 @@ interface DealerCodesManagerProps {
 export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
   const [dealerName, setDealerName] = React.useState("");
   const [plateInput, setPlateInput] = React.useState("");
-  const [count, setCount] = React.useState(5);
-  const [generating, setGenerating] = React.useState(false);
   const [registeringPlate, setRegisteringPlate] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unused" | "used">("unused");
@@ -92,7 +89,7 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
         return;
       }
       const code = data.codes[0] as string;
-      toast.success(`Code ${formatDealerCodeDisplay(code)} enregistré`);
+      toast.success(`Immatriculation ${formatDealerCodeDisplay(code)} enregistrée`);
       setPlateInput("");
       setSelected(new Set([code]));
       await loadCodes();
@@ -107,41 +104,6 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
       toast.error("Erreur réseau");
     } finally {
       setRegisteringPlate(false);
-    }
-  }
-
-  async function handleGenerate(e: React.FormEvent) {
-    e.preventDefault();
-    if (!dealerName.trim()) {
-      toast.error("Indiquez le nom du point de vente / concessionnaire.");
-      return;
-    }
-    setGenerating(true);
-    try {
-      const res = await fetch("/api/admin/dealer-codes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count, dealerName: dealerName.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.error ?? "Génération impossible");
-        return;
-      }
-      toast.success(`${data.codes.length} code(s) généré(s) pour ${dealerName.trim()}`);
-      setSelected(new Set(data.codes as string[]));
-      await loadCodes();
-      openPrintSheet(
-        (data.codes as string[]).map((code: string) => ({
-          code,
-          dealerName: dealerName.trim(),
-          registerUrl: buildRegisterUrl(code, siteUrl),
-        }))
-      );
-    } catch {
-      toast.error("Erreur réseau");
-    } finally {
-      setGenerating(false);
     }
   }
 
@@ -193,37 +155,16 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Générer des codes</CardTitle>
+            <CardTitle className="text-base">Enregistrer un véhicule livré</CardTitle>
             <CardDescription>
-              Format immatriculation SIV : <strong>AB-123-CD</strong> (2 lettres, 3 chiffres, 2
-              lettres). Idéal : utiliser la plaque du véhicule livré.
+              Le numéro d&apos;immatriculation du véhicule livré devient le code d&apos;activation.
+              Le client saisira la même plaque dans l&apos;application pour bénéficier de 12 mois
+              gratuits. Format SIV attendu : <strong>AB-123-CD</strong>.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <form onSubmit={handleRegisterPlate} className="grid gap-4 rounded-lg border bg-muted/30 p-4 sm:grid-cols-3">
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="plate-input">Immatriculation du véhicule livré</Label>
-                <Input
-                  id="plate-input"
-                  placeholder="Ex. AB-123-CD"
-                  value={plateInput}
-                  onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
-                  className="font-mono uppercase tracking-wider"
-                />
-              </div>
-              <div className="flex items-end">
-                <Button type="submit" variant="secondary" className="w-full" disabled={registeringPlate}>
-                  {registeringPlate ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Enregistrer la plaque"
-                  )}
-                </Button>
-              </div>
-            </form>
-
-            <form onSubmit={handleGenerate} className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-2 sm:col-span-2">
+          <CardContent>
+            <form onSubmit={handleRegisterPlate} className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
                 <Label htmlFor="dealer-name">Point de vente / concessionnaire</Label>
                 <Input
                   id="dealer-name"
@@ -239,25 +180,21 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
                 </datalist>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="code-count">Nombre de codes</Label>
+                <Label htmlFor="plate-input">Immatriculation du véhicule livré</Label>
                 <Input
-                  id="code-count"
-                  type="number"
-                  min={1}
-                  max={50}
-                  value={count}
-                  onChange={(e) => setCount(Number(e.target.value))}
+                  id="plate-input"
+                  placeholder="Ex. AB-123-CD"
+                  value={plateInput}
+                  onChange={(e) => setPlateInput(e.target.value.toUpperCase())}
+                  className="font-mono uppercase tracking-wider"
                 />
               </div>
-              <div className="sm:col-span-3">
-                <Button type="submit" disabled={generating}>
-                  {generating ? (
+              <div className="sm:col-span-2">
+                <Button type="submit" disabled={registeringPlate}>
+                  {registeringPlate ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <>
-                      <QrCode className="h-4 w-4" />
-                      Générer {count} code(s) aléatoire(s)
-                    </>
+                    "Enregistrer l'immatriculation"
                   )}
                 </Button>
               </div>

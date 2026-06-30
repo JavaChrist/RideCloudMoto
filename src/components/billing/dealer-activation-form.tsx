@@ -21,7 +21,7 @@ export function DealerActivationForm({ compact = false }: DealerActivationFormPr
     e.preventDefault();
     const trimmed = code.trim();
     if (trimmed.length < 6) {
-      toast.error("Format invalide (ex. AB-123-CD).");
+      toast.error("Immatriculation invalide. Format attendu : AB-123-CD.");
       return;
     }
 
@@ -37,7 +37,7 @@ export function DealerActivationForm({ compact = false }: DealerActivationFormPr
         toast.error(data.error ?? "Activation impossible.");
         return;
       }
-      toast.success("Offre concessionnaire activée !");
+      toast.success("Offre activée ! Profitez de 12 mois gratuits.");
       setCode("");
       router.refresh();
     } catch {
@@ -51,7 +51,7 @@ export function DealerActivationForm({ compact = false }: DealerActivationFormPr
     <form onSubmit={handleSubmit} className={compact ? "flex gap-2" : "space-y-3"}>
       <div className={compact ? "min-w-0 flex-1" : "space-y-2"}>
         {!compact ? (
-          <Label htmlFor="dealer-code">Code concessionnaire</Label>
+          <Label htmlFor="dealer-code">Immatriculation de votre véhicule</Label>
         ) : null}
         <Input
           id="dealer-code"

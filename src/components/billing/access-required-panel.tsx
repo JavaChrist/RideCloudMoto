@@ -17,8 +17,9 @@ export function AccessRequiredPanel() {
           </div>
           <CardTitle>Activez votre accès</CardTitle>
           <CardDescription>
-            RideCloudMoto est accessible avec un <strong>code concessionnaire</strong> (offert
-            à l&apos;achat de votre moto, 1 véhicule pendant 12 mois) ou un abonnement{" "}
+            Si vous venez d&apos;acheter votre moto chez un concessionnaire partenaire, saisissez
+            l&apos;<strong>immatriculation de votre véhicule</strong> pour bénéficier de
+            12 mois gratuits (1 véhicule). Sinon, souscrivez à l&apos;abonnement{" "}
             <strong>Premium</strong>.
           </CardDescription>
         </CardHeader>
