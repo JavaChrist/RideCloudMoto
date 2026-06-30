@@ -22,3 +22,14 @@ export function getSiteUrl(): string {
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
   );
 }
+
+/** URL publique pour QR codes, liens d'inscription et documents client. */
+export function getPublicSiteUrl(): string {
+  const production = "https://ride-cloud-moto.vercel.app";
+  const configured =
+    process.env.NEXT_PUBLIC_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL;
+  if (configured && !/localhost|127\.0\.0\.1/i.test(configured)) {
+    return configured.replace(/\/$/, "");
+  }
+  return production;
+}

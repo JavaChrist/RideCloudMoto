@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Printer } from "lucide-react";
 import { formatDealerCodeDisplay } from "@/lib/billing/dealer-activation";
-import { buildQrCodeImageUrl, buildRegisterUrl } from "@/lib/dealer/register-url";
+import { buildQrCodeDataUrl, buildRegisterUrl } from "@/lib/dealer/register-url";
 import { Button } from "@/components/ui/button";
 
 interface DealerFlyerPrintProps {
@@ -14,11 +15,21 @@ interface DealerFlyerPrintProps {
 
 export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrintProps) {
   const registerUrl = buildRegisterUrl(code, siteUrl);
-  const qrUrl = buildQrCodeImageUrl(registerUrl, 200);
+  const [qrUrl, setQrUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     document.title = `Flyer RideCloudMoto — ${code}`;
   }, [code]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    buildQrCodeDataUrl(registerUrl, 200).then((url) => {
+      if (!cancelled) setQrUrl(url);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [registerUrl]);
 
   return (
     <div className="min-h-dvh bg-neutral-200 py-6 print:bg-white print:py-0">
@@ -33,9 +44,14 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
         <header className="bg-gradient-to-br from-neutral-800 via-neutral-950 to-amber-950 px-9 pb-20 pt-8 text-white">
           <div className="mb-8 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FACC15] text-sm font-extrabold text-neutral-950">
-                RM
-              </div>
+              <Image
+                src="/logo192.png"
+                alt="RideCloudMoto"
+                width={44}
+                height={44}
+                className="shrink-0 rounded-xl"
+                priority
+              />
               <div>
                 <div className="text-xl font-bold">
                   RideCloud<span className="text-[#FACC15]">Moto</span>
@@ -59,8 +75,17 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
 
         <section className="-mt-14 px-9">
           <div className="grid grid-cols-[160px_1fr] gap-6 rounded-2xl border bg-white p-6 shadow-lg">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrUrl} alt="QR inscription" width={148} height={148} className="rounded-xl border" />
+            {qrUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={qrUrl} alt="QR inscription" width={148} height={148} className="rounded-xl border" />
+            ) : (
+              <div
+                className="flex h-[148px] w-[148px] items-center justify-center rounded-xl border bg-neutral-100 text-xs text-neutral-400"
+                aria-hidden
+              >
+                QR…
+              </div>
+            )}
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-amber-700">
                 Offert par votre concessionnaire

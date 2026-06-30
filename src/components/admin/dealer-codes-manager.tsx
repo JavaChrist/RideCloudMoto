@@ -14,12 +14,14 @@ import {
 } from "lucide-react";
 import type { DealerActivationCode } from "@/types/database";
 import { formatDealerCodeDisplay } from "@/lib/billing/dealer-activation";
-import { buildQrCodeImageUrl, buildRegisterUrl } from "@/lib/dealer/register-url";
+import { buildQrCodeDataUrl, buildRegisterUrl } from "@/lib/dealer/register-url";
+import { formatDateShort } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FrenchDateInput } from "@/components/ui/french-date-input";
 import { DealerCodePrintSheet } from "./dealer-code-print-sheet";
 
 interface DealerCodesManagerProps {
@@ -43,7 +45,7 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
   const [dealers, setDealers] = React.useState<string[]>([]);
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
   const [printCodes, setPrintCodes] = React.useState<
-    { code: string; dealerName: string | null; registerUrl: string }[] | null
+    { code: string; dealerName: string | null; registerUrl: string; qrUrl: string }[] | null
   >(null);
 
   const loadCodes = React.useCallback(async () => {
@@ -113,7 +115,7 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
       setPurchaseDate("");
       setSelected(new Set([code]));
       await loadCodes();
-      openPrintSheet([
+      await openPrintSheet([
         {
           code,
           dealerName: registeredDealerName,
@@ -133,11 +135,19 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
     window.location.href = `/api/admin/dealer-codes/export?${params}`;
   }
 
-  function openPrintSheet(
+  async function openPrintSheet(
     items: { code: string; dealerName: string | null; registerUrl: string }[]
   ) {
-    setPrintCodes(items);
-    setTimeout(() => window.print(), 150);
+    const withQr = await Promise.all(
+      items.map(async (item) => ({
+        ...item,
+        qrUrl: await buildQrCodeDataUrl(item.registerUrl, 180),
+      }))
+    );
+    setPrintCodes(withQr);
+    requestAnimationFrame(() => {
+      setTimeout(() => window.print(), 200);
+    });
   }
 
   function toggleSelect(code: string) {
@@ -232,11 +242,10 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="purchase-date">Date d&apos;achat</Label>
-                  <Input
+                  <FrenchDateInput
                     id="purchase-date"
-                    type="date"
                     value={purchaseDate}
-                    onChange={(e) => setPurchaseDate(e.target.value)}
+                    onChange={setPurchaseDate}
                   />
                 </div>
               </section>
@@ -414,9 +423,7 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
                             <td className="p-3">{row.vehicle_model ?? "—"}</td>
                             <td className="p-3">{row.dealer_name ?? "—"}</td>
                             <td className="p-3 text-muted-foreground">
-                              {row.purchase_date
-                                ? new Date(row.purchase_date).toLocaleDateString("fr-FR")
-                                : "—"}
+                              {row.purchase_date ? formatDateShort(row.purchase_date) : "—"}
                             </td>
                             <td className="p-3">
                               {isUsed ? (
@@ -506,13 +513,7 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
       </div>
 
       {printCodes ? (
-        <DealerCodePrintSheet
-          items={printCodes.map((item) => ({
-            ...item,
-            qrUrl: buildQrCodeImageUrl(item.registerUrl, 180),
-          }))}
-          onClose={() => setPrintCodes(null)}
-        />
+        <DealerCodePrintSheet items={printCodes} onClose={() => setPrintCodes(null)} />
       ) : null}
     </>
   );

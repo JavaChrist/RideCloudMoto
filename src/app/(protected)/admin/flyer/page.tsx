@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSiteUrl } from "@/lib/supabase/env";
+import { getPublicSiteUrl } from "@/lib/supabase/env";
 import { DealerFlyerPrint } from "@/components/admin/dealer-flyer-print";
 
 export const metadata: Metadata = { title: "Flyer concessionnaire" };
@@ -25,7 +25,7 @@ export default async function AdminFlyerPage({ searchParams }: AdminFlyerPagePro
     <DealerFlyerPrint
       code={normalized}
       dealerName={dealer?.trim() || null}
-      siteUrl={getSiteUrl()}
+      siteUrl={getPublicSiteUrl()}
     />
   );
 }
