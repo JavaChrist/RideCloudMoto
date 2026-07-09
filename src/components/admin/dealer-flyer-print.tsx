@@ -125,7 +125,7 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
         </section>
 
         <footer className="border-t px-9 py-5 text-center text-xs text-neutral-600">
-          ride-cloud-moto.vercel.app · support@javachrist.fr
+          moto.ridecloud.app · info@moto.ridecloud.app
         </footer>
       </article>
     </div>

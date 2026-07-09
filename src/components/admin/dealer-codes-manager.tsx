@@ -43,6 +43,10 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
   const [filterDealer, setFilterDealer] = React.useState("");
   const [codes, setCodes] = React.useState<DealerActivationCode[]>([]);
   const [dealers, setDealers] = React.useState<string[]>([]);
+  const [structuredDealers, setStructuredDealers] = React.useState<
+    { id: string; name: string }[]
+  >([]);
+  const [dealerId, setDealerId] = React.useState("");
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
   const [printCodes, setPrintCodes] = React.useState<
     { code: string; dealerName: string | null; registerUrl: string; qrUrl: string }[] | null
@@ -61,6 +65,7 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
       }
       setCodes(data.codes ?? []);
       setDealers(data.dealers ?? []);
+      setStructuredDealers(data.structuredDealers ?? []);
     } catch {
       toast.error("Erreur réseau");
     } finally {
@@ -90,6 +95,7 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
         body: JSON.stringify({
           plate: plateInput.trim(),
           dealerName: dealerName.trim(),
+          dealerId: dealerId || undefined,
           customerFirstName: customerFirstName.trim(),
           customerLastName: customerLastName.trim(),
           customerEmail: customerEmail.trim(),
@@ -184,9 +190,14 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
               Générez des codes à usage unique, QR d&apos;inscription et flyers par point de vente.
             </p>
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/parametres">← Paramètres</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/admin/dealers">Concessionnaires →</Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/parametres">← Paramètres</Link>
+            </Button>
+          </div>
         </div>
 
         <Card>
@@ -204,6 +215,29 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
                 <h3 className="sm:col-span-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                   Véhicule & concessionnaire
                 </h3>
+                {structuredDealers.length > 0 ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="dealer-select">Concessionnaire partenaire</Label>
+                    <select
+                      id="dealer-select"
+                      className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                      value={dealerId}
+                      onChange={(e) => {
+                        const id = e.target.value;
+                        setDealerId(id);
+                        const found = structuredDealers.find((d) => d.id === id);
+                        if (found) setDealerName(found.name);
+                      }}
+                    >
+                      <option value="">— Aucun (saisie libre) —</option>
+                      {structuredDealers.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : null}
                 <div className="space-y-2">
                   <Label htmlFor="dealer-name">Point de vente / concessionnaire *</Label>
                   <Input

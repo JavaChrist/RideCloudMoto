@@ -55,13 +55,16 @@ Cliquez **Deploy**. Le premier build prend 2-3 minutes.
 
 ## 3. Configurer le domaine personnalisé
 
+Domaine de production : **`moto.ridecloud.app`** (sous-domaine de `ridecloud.app`).
+
 Une fois le premier déploiement réussi (sur `ridecloudmoto.vercel.app`) :
 
 1. **Project Settings → Domains → Add**
-2. Saisir votre domaine → **Add**
-3. Suivez les instructions DNS de Vercel :
-   - **Apex** : enregistrement `A` vers `76.76.21.21`
-   - **www** : `CNAME` vers `cname.vercel-dns.com.`
+2. Saisir `moto.ridecloud.app` → **Add**
+3. Suivez les instructions DNS de Vercel. Pour un **sous-domaine**, chez le registrar
+   de `ridecloud.app`, ajoutez un enregistrement `CNAME` :
+   - **Nom / Host** : `moto`
+   - **Valeur / Target** : `cname.vercel-dns.com.`
 4. Propagation : 5 à 30 minutes (jusqu'à 24 h en théorie). La pastille devient **verte**
    dans Vercel quand le DNS est OK. Vercel émet automatiquement un certificat TLS.
 
@@ -73,10 +76,10 @@ Une fois le premier déploiement réussi (sur `ridecloudmoto.vercel.app`) :
 
 Supabase Dashboard → **Authentication → URL Configuration** :
 
-- **Site URL** : `https://votre-domaine`
+- **Site URL** : `https://moto.ridecloud.app`
 - **Redirect URLs** (ajoutez TOUTES ces entrées) :
-  - `https://votre-domaine/auth/callback`
-  - `https://votre-domaine/reset-password`
+  - `https://moto.ridecloud.app/auth/callback`
+  - `https://moto.ridecloud.app/reset-password`
   - `http://localhost:3000/auth/callback` (dev local)
   - `https://*.vercel.app/auth/callback` (Preview deployments)
 

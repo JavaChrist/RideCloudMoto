@@ -66,7 +66,18 @@ export async function GET(request: Request) {
     ),
   ].sort();
 
-  return NextResponse.json({ codes: codes ?? [], dealers });
+  // Concessionnaires structurés (table dealers) pour rattacher un code.
+  const { data: structuredDealers } = await admin
+    .from("dealers")
+    .select("id, name")
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+
+  return NextResponse.json({
+    codes: codes ?? [],
+    dealers,
+    structuredDealers: structuredDealers ?? [],
+  });
 }
 
 /** Enregistre un code à partir de l'immatriculation du véhicule livré (admin). */
@@ -78,6 +89,7 @@ export async function POST(request: Request) {
 
   let body: {
     dealerName?: string;
+    dealerId?: string;
     plate?: string;
     customerFirstName?: string;
     customerLastName?: string;
@@ -103,6 +115,7 @@ export async function POST(request: Request) {
   const admin = createAdminClient();
   const result = await registerPlateAsDealerCode(admin, plate, {
     dealerName: body.dealerName,
+    dealerId: body.dealerId,
     customerFirstName: body.customerFirstName,
     customerLastName: body.customerLastName,
     customerEmail: body.customerEmail,

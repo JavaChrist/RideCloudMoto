@@ -8,6 +8,12 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+/* Gestionnaire fetch minimal (réseau d'abord) — requis pour l'installabilité PWA. */
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+  event.respondWith(fetch(event.request).catch(() => Response.error()));
+});
+
 self.addEventListener("push", (event) => {
   let payload = {};
   try {

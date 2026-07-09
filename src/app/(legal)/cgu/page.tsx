@@ -49,13 +49,13 @@ export default function CguPage() {
         {
           heading: "7. Médiateur de la consommation",
           body: [
-            "Conformément aux articles L611-1 et suivants du Code de la consommation, vous pouvez recourir gratuitement à un médiateur de la consommation en vue de la résolution amiable d'un litige. Les coordonnées du médiateur compétent sont communiquées sur demande à support@javachrist.fr.",
+            "Conformément aux articles L611-1 et suivants du Code de la consommation, vous pouvez recourir gratuitement à un médiateur de la consommation en vue de la résolution amiable d'un litige. Les coordonnées du médiateur compétent sont communiquées sur demande à info@moto.ridecloud.app.",
           ],
         },
         {
           heading: "8. Éditeur et contact",
           body: [
-            "RideCloudMoto est édité par JavaChrist (Grohens Christian), entreprise individuelle, SIRET 338 593 312 000 30. Contact : support@javachrist.fr.",
+            "RideCloudMoto est édité par JavaChrist (Grohens Christian), entreprise individuelle, SIRET 338 593 312 000 30. Contact : info@moto.ridecloud.app.",
           ],
         },
       ]}

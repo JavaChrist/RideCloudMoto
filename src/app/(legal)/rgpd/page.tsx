@@ -42,7 +42,7 @@ export default function RgpdPage() {
         {
           heading: "Contact & réclamation",
           body: [
-            "Pour exercer vos droits, écrivez à support@javachrist.fr. Vous disposez également du droit d'introduire une réclamation auprès de la CNIL (www.cnil.fr).",
+            "Pour exercer vos droits, écrivez à info@moto.ridecloud.app. Vous disposez également du droit d'introduire une réclamation auprès de la CNIL (www.cnil.fr).",
           ],
         },
       ]}

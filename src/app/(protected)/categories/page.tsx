@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { ALL_CATEGORIES } from "@/lib/data/demo";
 import { CategoryCard } from "@/components/categories/category-card";
+import { RideCloudCrossSell } from "@/components/common/ridecloud-cross-sell";
 import { Button } from "@/components/ui/button";
 import type { VehicleCategory } from "@/types/database";
 
@@ -58,6 +59,8 @@ export default async function CategoriesPage() {
           <CategoryCard key={category} category={category} count={counts[category]} />
         ))}
       </div>
+
+      <RideCloudCrossSell />
     </div>
   );
 }

@@ -447,7 +447,7 @@ récurrents **Mollie** (SEPA + carte).
 - **Rectification** : édition libre depuis l'UI.
 - **Effacement** : suppression de compte en cascade en quelques secondes.
 - **Opposition** : cookies strictement nécessaires ; notifications push sur opt-in.
-- **Contact** : `support@javachrist.fr`.
+- **Contact** : `info@moto.ridecloud.app`.
 
 ### Sécurité technique
 - TLS + HSTS, RLS sur toutes les tables, service role / VAPID privée côté serveur uniquement,
@@ -471,5 +471,5 @@ Couleur clé   : #FACC15 (jaune) · #0A0A0A (noir)
 Modèle        : Premium offert puis Freemium SaaS récurrent
 Conformité    : RGPD · LCEN · ePrivacy · médiateur de la consommation
 Marché        : France
-Support       : support@javachrist.fr
+Support       : info@moto.ridecloud.app
 ```

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Settings } from "lucide-react";
+import { Settings, Store } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -13,6 +13,7 @@ interface ProtectedHeaderProps {
   isPremium: boolean;
   isDealerOffer: boolean;
   dealerDaysLeft?: number | null;
+  hasDealer?: boolean;
 }
 
 export function ProtectedHeader({
@@ -20,6 +21,7 @@ export function ProtectedHeader({
   isPremium,
   isDealerOffer,
   dealerDaysLeft,
+  hasDealer = false,
 }: ProtectedHeaderProps) {
   return (
     <header className="safe-area-top safe-area-x fixed inset-x-0 top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -37,6 +39,19 @@ export function ProtectedHeader({
         </div>
         <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
           <ThemeToggle />
+          {hasDealer ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 sm:h-10 sm:w-10"
+              asChild
+              aria-label="Mon concessionnaire"
+            >
+              <Link href="/mon-concessionnaire">
+                <Store className="h-5 w-5" />
+              </Link>
+            </Button>
+          ) : null}
           <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10" asChild aria-label="Paramètres">
             <Link href="/parametres">
               <Settings className="h-5 w-5" />

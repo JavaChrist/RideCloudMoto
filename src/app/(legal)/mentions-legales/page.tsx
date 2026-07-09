@@ -12,7 +12,7 @@ export default function MentionsLegalesPage() {
           heading: "Éditeur",
           body: [
             "RideCloudMoto est édité par JavaChrist (Grohens Christian), entreprise individuelle, SIRET 338 593 312 000 30.",
-            "Pour toute question, contactez l'éditeur à l'adresse support@javachrist.fr.",
+            "Pour toute question, contactez l'éditeur à l'adresse info@moto.ridecloud.app.",
           ],
         },
         {
@@ -35,7 +35,7 @@ export default function MentionsLegalesPage() {
         },
         {
           heading: "Contact",
-          body: ["support@javachrist.fr"],
+          body: ["info@moto.ridecloud.app"],
         },
       ]}
     />

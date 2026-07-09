@@ -63,7 +63,7 @@ export async function redeemDealerActivationCode(
 
   const { data: row, error: fetchErr } = await admin
     .from("dealer_activation_codes")
-    .select("id, used_by, expires_at")
+    .select("id, used_by, expires_at, dealer_id")
     .eq("code", code)
     .maybeSingle();
 
@@ -79,8 +79,21 @@ export async function redeemDealerActivationCode(
     return { ok: false, error: "Ce code a expiré." };
   }
 
+  // Durée de l'offre : celle du concessionnaire lié si disponible, sinon défaut plateforme.
+  let offerMonths = DEALER_FREE_MONTHS;
+  if (row.dealer_id) {
+    const { data: dealer } = await admin
+      .from("dealers")
+      .select("offer_months")
+      .eq("id", row.dealer_id)
+      .maybeSingle();
+    if (dealer?.offer_months && Number(dealer.offer_months) > 0) {
+      offerMonths = Number(dealer.offer_months);
+    }
+  }
+
   const until = new Date();
-  until.setMonth(until.getMonth() + DEALER_FREE_MONTHS);
+  until.setMonth(until.getMonth() + offerMonths);
   const untilIso = until.toISOString();
 
   const { data: claimed, error: claimErr } = await admin
@@ -100,6 +113,7 @@ export async function redeemDealerActivationCode(
       id: userId,
       email,
       dealer_premium_until: untilIso,
+      ...(row.dealer_id ? { dealer_id: row.dealer_id } : {}),
     },
     { onConflict: "id" }
   );
@@ -113,6 +127,7 @@ export async function redeemDealerActivationCode(
 
 export interface DealerCodeCustomerInfo {
   dealerName?: string | null;
+  dealerId?: string | null;
   customerFirstName?: string | null;
   customerLastName?: string | null;
   customerEmail?: string | null;
@@ -128,6 +143,7 @@ function toDbColumns(info: DealerCodeCustomerInfo) {
   };
   return {
     dealer_name: clean(info.dealerName),
+    dealer_id: clean(info.dealerId),
     customer_first_name: clean(info.customerFirstName),
     customer_last_name: clean(info.customerLastName),
     customer_email: clean(info.customerEmail)?.toLowerCase() ?? null,
@@ -186,4 +202,64 @@ export async function registerPlateAsDealerCode(
   }
 
   return { ok: true, code };
+}
+
+/**
+ * Prolonge la licence d'un client rattaché à une fiche (code) du concessionnaire.
+ * Utilisé pour la fidélisation : offrir une période supplémentaire après une révision.
+ * La période est ajoutée à la date de fin actuelle (ou à aujourd'hui si déjà expirée).
+ */
+export async function extendDealerLicense(
+  admin: SupabaseClient,
+  dealerId: string,
+  codeId: string,
+  extraMonths?: number
+): Promise<{ ok: true; until: string } | { ok: false; error: string }> {
+  const { data: row } = await admin
+    .from("dealer_activation_codes")
+    .select("id, dealer_id, used_by")
+    .eq("id", codeId)
+    .maybeSingle();
+
+  if (!row || row.dealer_id !== dealerId) {
+    return { ok: false, error: "Fiche introuvable pour ce concessionnaire." };
+  }
+  if (!row.used_by) {
+    return { ok: false, error: "Cette licence n'a pas encore été activée par le client." };
+  }
+
+  let months = extraMonths && extraMonths > 0 ? Math.round(extraMonths) : 0;
+  if (!months) {
+    const { data: dealer } = await admin
+      .from("dealers")
+      .select("offer_months")
+      .eq("id", dealerId)
+      .maybeSingle();
+    months = dealer?.offer_months && Number(dealer.offer_months) > 0 ? Number(dealer.offer_months) : DEALER_FREE_MONTHS;
+  }
+
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("dealer_premium_until")
+    .eq("id", row.used_by)
+    .maybeSingle();
+
+  const now = Date.now();
+  const current = profile?.dealer_premium_until
+    ? new Date(profile.dealer_premium_until).getTime()
+    : 0;
+  const base = new Date(Math.max(now, Number.isNaN(current) ? 0 : current));
+  base.setMonth(base.getMonth() + months);
+  const untilIso = base.toISOString();
+
+  const { error } = await admin
+    .from("profiles")
+    .update({ dealer_premium_until: untilIso, dealer_id: dealerId })
+    .eq("id", row.used_by);
+
+  if (error) {
+    return { ok: false, error: "Impossible de prolonger la licence." };
+  }
+
+  return { ok: true, until: untilIso };
 }

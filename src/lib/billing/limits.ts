@@ -17,6 +17,12 @@ export interface PlanState {
   dealerDaysLeft: number | null;
   /** True si l'abonnement payant est expiré/annulé. */
   isExpired: boolean;
+  /**
+   * Mode lecture seule : l'utilisateur a déjà eu un accès (offre concessionnaire
+   * ou Premium) désormais expiré. Il peut consulter/exporter son historique mais
+   * ne peut plus ajouter, modifier ou supprimer de données.
+   */
+  isReadOnly: boolean;
   maxVehicles: number;
 }
 
@@ -71,6 +77,15 @@ export function getUserPlanState(profile: Profile, at: Date = new Date()): PlanS
     effectivePlan = "free";
   }
 
+  // Lecture seule : un accès a existé par le passé mais a expiré.
+  const dealerOfferLapsed =
+    dealerPremiumUntil != null &&
+    !Number.isNaN(dealerPremiumUntil.getTime()) &&
+    dealerPremiumUntil.getTime() <= at.getTime();
+  const subscriptionLapsed =
+    expired || profile.plan === "premium" || profile.plan_status === "canceled";
+  const isReadOnly = !hasAccess && (dealerOfferLapsed || subscriptionLapsed);
+
   return {
     effectivePlan,
     paidPlan,
@@ -79,8 +94,14 @@ export function getUserPlanState(profile: Profile, at: Date = new Date()): PlanS
     dealerPremiumUntil,
     dealerDaysLeft: dealerActive ? dealerDaysLeft : null,
     isExpired: expired,
+    isReadOnly,
     maxVehicles: hasAccess ? maxVehiclesForPlan(effectivePlan) : 0,
   };
+}
+
+/** True si le compte est en lecture seule (ancien accès expiré). */
+export function isReadOnly(profile: Profile, at: Date = new Date()): boolean {
+  return getUserPlanState(profile, at).isReadOnly;
 }
 
 export function hasAppAccess(profile: Profile, at: Date = new Date()): boolean {

@@ -48,7 +48,7 @@ export default function ConfidentialitePage() {
         {
           heading: "Vos droits",
           body: [
-            "Vous disposez d'un droit d'accès, de rectification, d'effacement, de portabilité et d'opposition. Pour les exercer, contactez-nous à support@javachrist.fr.",
+            "Vous disposez d'un droit d'accès, de rectification, d'effacement, de portabilité et d'opposition. Pour les exercer, contactez-nous à info@moto.ridecloud.app.",
           ],
         },
       ]}

@@ -6,6 +6,68 @@
 -- ── Extensions ──────────────────────────────────────────────────────────────
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- ── dealers (concessionnaires partenaires) ───────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.dealers (
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug             text NOT NULL UNIQUE,
+  name             text NOT NULL,
+  logo_url         text,
+  primary_color    text,
+  secondary_color  text,
+  address          text,
+  postal_code      text,
+  city             text,
+  phone            text,
+  email            text,
+  website          text,
+  latitude         double precision,
+  longitude        double precision,
+  hours            jsonb,
+  brands           text[] NOT NULL DEFAULT '{}',
+  booking_url      text,
+  offer_months     integer NOT NULL DEFAULT 12,
+  is_active        boolean NOT NULL DEFAULT true,
+  created_at       timestamptz NOT NULL DEFAULT now(),
+  updated_at       timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.dealers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY dealers_select_all ON public.dealers FOR SELECT USING (true);
+
+-- ── dealer_promotions ────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.dealer_promotions (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  dealer_id    uuid NOT NULL REFERENCES public.dealers(id) ON DELETE CASCADE,
+  title        text NOT NULL,
+  description  text,
+  valid_from   date,
+  valid_until  date,
+  is_active    boolean NOT NULL DEFAULT true,
+  created_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_dealer_promotions_dealer
+  ON public.dealer_promotions (dealer_id) WHERE is_active;
+
+ALTER TABLE public.dealer_promotions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY dealer_promotions_select_all ON public.dealer_promotions FOR SELECT USING (true);
+
+-- ── dealer_users (comptes concessionnaire — portail self-service) ─────────────
+CREATE TABLE IF NOT EXISTS public.dealer_users (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  dealer_id   uuid NOT NULL REFERENCES public.dealers(id) ON DELETE CASCADE,
+  user_id     uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role        text NOT NULL DEFAULT 'staff' CHECK (role IN ('owner','staff')),
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT dealer_users_user_unique UNIQUE (user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_dealer_users_dealer ON public.dealer_users (dealer_id);
+
+ALTER TABLE public.dealer_users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY dealer_users_select_own ON public.dealer_users
+  FOR SELECT USING (auth.uid() = user_id);
+
 -- ── profiles ────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.profiles (
   id                       uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -22,6 +84,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   mollie_mandate_id        text,
   -- Offre concessionnaire : accès gratuit (1 véhicule) jusqu'à cette date — activée via code
   dealer_premium_until     timestamptz,
+  -- Concessionnaire d'origine (branding + carte "Mon concessionnaire")
+  dealer_id                uuid REFERENCES public.dealers(id) ON DELETE SET NULL,
   created_at               timestamptz NOT NULL DEFAULT now(),
   updated_at               timestamptz NOT NULL DEFAULT now()
 );
@@ -201,6 +265,10 @@ CREATE TRIGGER set_maintenance_plan_entries_updated_at
   BEFORE UPDATE ON public.maintenance_plan_entries
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
+CREATE TRIGGER set_dealers_updated_at
+  BEFORE UPDATE ON public.dealers
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
 -- ── Storage bucket ────────────────────────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('ridecloudmoto-files', 'ridecloudmoto-files', false)
@@ -231,20 +299,35 @@ CREATE POLICY storage_delete_own ON storage.objects FOR DELETE
 
 -- ── Codes activation concessionnaire ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.dealer_activation_codes (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  code         text NOT NULL UNIQUE,
-  dealer_name  text,
-  used_by      uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  used_at      timestamptz,
-  expires_at   timestamptz,
-  created_at   timestamptz NOT NULL DEFAULT now()
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code                text NOT NULL UNIQUE,
+  dealer_name         text,
+  dealer_id           uuid REFERENCES public.dealers(id) ON DELETE SET NULL,
+  customer_first_name text,
+  customer_last_name  text,
+  customer_email      text,
+  customer_phone      text,
+  vehicle_model       text,
+  purchase_date       date,
+  used_by             uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  used_at             timestamptz,
+  expires_at          timestamptz,
+  created_at          timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_dealer_codes_unused
   ON public.dealer_activation_codes (code)
   WHERE used_by IS NULL;
 
+CREATE INDEX IF NOT EXISTS idx_dealer_codes_dealer
+  ON public.dealer_activation_codes (dealer_id) WHERE dealer_id IS NOT NULL;
+
 ALTER TABLE public.dealer_activation_codes ENABLE ROW LEVEL SECURITY;
+
+-- Seed : premier partenaire (Voge)
+INSERT INTO public.dealers (slug, name, primary_color, brands, offer_months, is_active)
+VALUES ('voge', 'Voge', '#FACC15', ARRAY['Voge'], 12, true)
+ON CONFLICT (slug) DO NOTHING;
 
 -- ── Trigger création profil (sans offre automatique) ───────────────────────
 CREATE OR REPLACE FUNCTION public.handle_new_user()

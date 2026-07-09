@@ -4,7 +4,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureProfile } from "@/lib/billing/ensure-profile";
 import { ProtectedShell } from "@/components/layout/protected-shell";
 import { isAdminEmail } from "@/lib/admin";
-import type { Profile } from "@/types/database";
+import { getDealerById } from "@/lib/dealer/dealer-info";
+import type { Dealer, Profile } from "@/types/database";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -39,11 +40,22 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 
   const isAdmin = isAdminEmail(user.email);
 
+  let dealer: Dealer | null = null;
+  const dealerId = (profile as Profile | null)?.dealer_id ?? null;
+  if (dealerId) {
+    try {
+      dealer = await getDealerById(supabase, dealerId);
+    } catch {
+      // non bloquant
+    }
+  }
+
   return (
     <ProtectedShell
       profile={(profile as Profile) ?? null}
       email={user.email ?? ""}
       isAdmin={isAdmin}
+      dealer={dealer}
     >
       {children}
     </ProtectedShell>

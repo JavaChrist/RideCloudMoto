@@ -55,10 +55,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Connecté sur une route d'auth → /categories
+  // Connecté sur une route d'auth → routage selon le rôle (via /post-login)
   if (user && isAuthRoute(pathname)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/categories";
+    url.pathname = "/post-login";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 

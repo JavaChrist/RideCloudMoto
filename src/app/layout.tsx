@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ConfirmProvider } from "@/components/providers/confirm-provider";
 import { ThemedToaster } from "@/components/common/themed-toaster";
 import { CookieBanner } from "@/components/common/cookie-banner";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <ConfirmProvider>
             {children}
+            <RegisterServiceWorker />
             <CookieBanner />
             <ThemedToaster />
           </ConfirmProvider>

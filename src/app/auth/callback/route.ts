@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureProfile } from "@/lib/billing/ensure-profile";
 import { isAdminEmail } from "@/lib/admin";
+import { getDealerMembership } from "@/lib/dealer/membership";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +39,17 @@ export async function GET(request: NextRequest) {
   }
 
   // Si un `next` explicite est fourni, on le respecte ; sinon route selon le rôle.
-  const destination =
-    nextParam ?? (isAdminEmail(data.user?.email) ? "/admin/dealer-codes" : "/categories");
+  let destination = nextParam;
+  if (!destination) {
+    if (isAdminEmail(data.user?.email)) {
+      destination = "/admin/dealer-codes";
+    } else {
+      const membership = data.user
+        ? await getDealerMembership(supabase, data.user.id)
+        : null;
+      destination = membership ? "/portail" : "/categories";
+    }
+  }
 
   return NextResponse.redirect(`${origin}${destination}`);
 }

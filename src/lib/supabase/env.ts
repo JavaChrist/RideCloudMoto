@@ -36,7 +36,7 @@ export function getAuthRedirectOrigin(): string {
 
 /** URL publique pour QR codes, liens d'inscription et documents client. */
 export function getPublicSiteUrl(): string {
-  const production = "https://ride-cloud-moto.vercel.app";
+  const production = "https://moto.ridecloud.app";
   const configured =
     process.env.NEXT_PUBLIC_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL;
   if (configured && !/localhost|127\.0\.0\.1/i.test(configured)) {

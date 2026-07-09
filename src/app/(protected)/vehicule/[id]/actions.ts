@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getWriteGuard } from "@/lib/billing/write-guard";
 import {
   maintenanceEntrySchema,
   modificationSchema,
@@ -25,8 +26,9 @@ export async function addMaintenanceEntry(
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
   }
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
   if (!userId) return { ok: false, error: "Non authentifié" };
+  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
 
   const { error } = await supabase.from("maintenance_entries").insert({
     user_id: userId,
@@ -97,8 +99,9 @@ export async function deleteMaintenanceEntry(
   vehicleId: string,
   entryId: string
 ): Promise<ActionResult> {
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
   if (!userId) return { ok: false, error: "Non authentifié" };
+  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
   const { error } = await supabase
     .from("maintenance_entries")
     .delete()
@@ -117,8 +120,9 @@ export async function addModification(
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
   }
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
   if (!userId) return { ok: false, error: "Non authentifié" };
+  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
 
   const { error } = await supabase.from("modifications").insert({
     user_id: userId,
@@ -138,8 +142,9 @@ export async function deleteModification(
   vehicleId: string,
   modId: string
 ): Promise<ActionResult> {
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
   if (!userId) return { ok: false, error: "Non authentifié" };
+  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
   const { error } = await supabase
     .from("modifications")
     .delete()

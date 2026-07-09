@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { ensureMaintenancePlanForVehicle } from "@/lib/data/vehicle-repository";
 import { getUserPlanState } from "@/lib/billing/limits";
+import { getWriteGuard } from "@/lib/billing/write-guard";
 import { avgKmPerYear } from "@/lib/usage-profile";
 import { vehicleFormSchema } from "@/lib/validators/vehicle";
 import { BRAND_INTERNAL } from "@/lib/data/vehicle-catalog";
@@ -110,17 +111,15 @@ export async function createVehicle(input: unknown): Promise<ActionResult> {
 }
 
 export async function deleteVehicle(vehicleId: string): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Non authentifié" };
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
+  if (!userId) return { ok: false, error: "Non authentifié" };
+  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
 
   const { error } = await supabase
     .from("vehicles")
     .delete()
     .eq("id", vehicleId)
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (error) return { ok: false, error: error.message };
   revalidatePath("/categories");
@@ -131,17 +130,15 @@ export async function setVehiclePhoto(
   vehicleId: string,
   photoUrl: string | null
 ): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Non authentifié" };
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
+  if (!userId) return { ok: false, error: "Non authentifié" };
+  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
 
   const { error } = await supabase
     .from("vehicles")
     .update({ photo_url: photoUrl })
     .eq("id", vehicleId)
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/vehicule/${vehicleId}`);
@@ -152,11 +149,9 @@ export async function updateKilometrage(
   vehicleId: string,
   kilometrage: number
 ): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Non authentifié" };
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
+  if (!userId) return { ok: false, error: "Non authentifié" };
+  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
 
   const { error } = await supabase
     .from("vehicles")
@@ -166,7 +161,7 @@ export async function updateKilometrage(
       last_odometer_date: new Date().toISOString().slice(0, 10),
     })
     .eq("id", vehicleId)
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/vehicule/${vehicleId}`);

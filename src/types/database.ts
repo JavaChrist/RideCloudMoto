@@ -21,8 +21,62 @@ export interface Profile {
   mollie_subscription_id: string | null;
   mollie_mandate_id: string | null;
   dealer_premium_until: string | null;
+  dealer_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Horaires d'ouverture : libellé libre par jour (ex. { lundi: "9h-12h / 14h-19h" }). */
+export type DealerHours = Partial<
+  Record<
+    "lundi" | "mardi" | "mercredi" | "jeudi" | "vendredi" | "samedi" | "dimanche",
+    string
+  >
+>;
+
+export interface Dealer {
+  id: string;
+  slug: string;
+  name: string;
+  logo_url: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  address: string | null;
+  postal_code: string | null;
+  city: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  hours: DealerHours | null;
+  brands: string[];
+  booking_url: string | null;
+  offer_months: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DealerPromotion {
+  id: string;
+  dealer_id: string;
+  title: string;
+  description: string | null;
+  valid_from: string | null;
+  valid_until: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+export type DealerRole = "owner" | "staff";
+
+export interface DealerUser {
+  id: string;
+  dealer_id: string;
+  user_id: string;
+  role: DealerRole;
+  created_at: string;
 }
 
 export interface Vehicle {
@@ -138,6 +192,7 @@ export interface DealerActivationCode {
   id: string;
   code: string;
   dealer_name: string | null;
+  dealer_id: string | null;
   customer_first_name: string | null;
   customer_last_name: string | null;
   customer_email: string | null;

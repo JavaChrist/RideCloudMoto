@@ -102,7 +102,7 @@ Aucun `console.log` n'expose d'e-mail, de mot de passe ou de token. Les rares tr
 | Effacement (art. 17) | Suppression définitive avec double confirmation | `/parametres` |
 | Portabilité (art. 20) | Export JSON + ZIP (données + fichiers) | Fiche véhicule |
 | Opposition (art. 21) | Cookies strictement nécessaires uniquement ; push sur opt-in | — |
-| Procédure | Email `support@javachrist.fr` | `/rgpd` |
+| Procédure | Email `info@moto.ridecloud.app` | `/rgpd` |
 
 **Délai de réponse** : < 1 mois (art. 12.3 RGPD). Export et suppression sont **immédiats**.
 
@@ -168,7 +168,7 @@ Aucun `console.log` n'expose d'e-mail, de mot de passe ou de token. Les rares tr
 2. **Journal d'audit** (table `audit_log`) pour les actions sensibles (suppression, export).
 3. **MFA utilisateurs** (Supabase TOTP) — optionnel.
 4. **`SELECT *` → sélections explicites** pour figer le contrat des données retournées.
-5. **Mention DPO/contact** : `support@javachrist.fr` (désignation d'un DPO non obligatoire
+5. **Mention DPO/contact** : `info@moto.ridecloud.app` (désignation d'un DPO non obligatoire
    tant que l'effectif < 250 personnes et sans traitement à grande échelle de données sensibles).
 
 ---
