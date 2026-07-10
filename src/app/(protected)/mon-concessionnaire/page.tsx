@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DealerMapCard } from "@/components/dealer/dealer-map-card";
 import { formatDateShort } from "@/lib/utils/date";
 import type { DealerHours, Profile } from "@/types/database";
 
@@ -155,6 +156,17 @@ export default async function MonConcessionnairePage() {
                 {dealer.website.replace(/^https?:\/\//, "")}
               </a>
             </div>
+          )}
+
+          {dealer.latitude != null && dealer.longitude != null && (
+            <DealerMapCard
+              lat={dealer.latitude}
+              lng={dealer.longitude}
+              name={dealer.name}
+              address={[dealer.address, dealer.postal_code, dealer.city]
+                .filter(Boolean)
+                .join(" ")}
+            />
           )}
 
           <div className="flex flex-col gap-2 pt-2 sm:flex-row">
