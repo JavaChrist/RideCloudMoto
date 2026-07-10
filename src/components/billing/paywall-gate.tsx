@@ -11,7 +11,14 @@ interface PaywallGateProps {
   children: React.ReactNode;
 }
 
-const EXEMPT_PREFIXES = ["/parametres", "/tarifs", "/admin", "/mon-concessionnaire"];
+const EXEMPT_PREFIXES = [
+  "/parametres",
+  "/tarifs",
+  "/admin",
+  "/mon-concessionnaire",
+  "/sos",
+  "/entraide",
+];
 
 export function PaywallGate({
   hasAccess,

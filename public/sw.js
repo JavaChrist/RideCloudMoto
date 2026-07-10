@@ -23,13 +23,15 @@ self.addEventListener("push", (event) => {
   }
 
   const title = payload.title || "RideCloudMoto";
+  const isSos = (payload.tag || "").indexOf("sos") === 0;
   const options = {
     body: payload.body || "",
     icon: payload.icon || "/logo192.png",
     badge: "/logo96.png",
     tag: payload.tag || "ridecloudmoto",
     data: { url: payload.url || "/categories" },
-    requireInteraction: false,
+    requireInteraction: isSos,
+    vibrate: isSos ? [200, 100, 200, 100, 200] : undefined,
   };
 
   event.waitUntil(self.registration.showNotification(title, options));

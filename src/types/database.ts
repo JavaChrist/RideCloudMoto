@@ -188,6 +188,32 @@ export interface PushSubscriptionRow {
   created_at: string;
 }
 
+export type SosKind = "panne" | "chute" | "perdu" | "autre";
+export type SosStatus = "active" | "resolved" | "cancelled";
+export type SosMessageKind = "message" | "coming";
+
+export interface SosAlert {
+  id: string;
+  user_id: string;
+  latitude: number;
+  longitude: number;
+  kind: SosKind;
+  note: string | null;
+  contact_phone: string | null;
+  status: SosStatus;
+  created_at: string;
+  resolved_at: string | null;
+}
+
+export interface SosMessage {
+  id: string;
+  sos_id: string;
+  user_id: string;
+  kind: SosMessageKind;
+  body: string | null;
+  created_at: string;
+}
+
 export interface DealerActivationCode {
   id: string;
   code: string;

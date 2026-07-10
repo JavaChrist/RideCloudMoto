@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { BookOpen, Plus, TriangleAlert } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { ALL_CATEGORIES } from "@/lib/data/demo";
 import { CategoryCard } from "@/components/categories/category-card";
@@ -58,6 +58,33 @@ export default async function CategoriesPage() {
         {ALL_CATEGORIES.map((category) => (
           <CategoryCard key={category} category={category} count={counts[category]} />
         ))}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Link
+          href="/sos"
+          className="flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-accent"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-600 text-white">
+            <TriangleAlert className="h-5 w-5" />
+          </span>
+          <span className="text-sm">
+            <span className="block font-semibold">SOS entraide</span>
+            <span className="text-muted-foreground">Alerter les motards proches</span>
+          </span>
+        </Link>
+        <Link
+          href="/entraide"
+          className="flex items-center gap-3 rounded-xl border p-4 transition-colors hover:bg-accent"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+            <BookOpen className="h-5 w-5" />
+          </span>
+          <span className="text-sm">
+            <span className="block font-semibold">Culture motard</span>
+            <span className="text-muted-foreground">Règles d&apos;or & le salut</span>
+          </span>
+        </Link>
       </div>
 
       <RideCloudCrossSell />

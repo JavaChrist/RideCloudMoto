@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Settings, Store } from "lucide-react";
+import { Settings, Store, TriangleAlert } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -38,6 +38,14 @@ export function ProtectedHeader({
           ) : null}
         </div>
         <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+          <Link
+            href="/sos"
+            aria-label="SOS entraide motard"
+            className="mr-0.5 inline-flex h-9 items-center gap-1.5 rounded-full bg-red-600 px-3 text-xs font-bold uppercase tracking-wide text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 sm:h-10 sm:px-4 sm:text-sm"
+          >
+            <TriangleAlert className="h-4 w-4" />
+            SOS
+          </Link>
           <ThemeToggle />
           {hasDealer ? (
             <Button
