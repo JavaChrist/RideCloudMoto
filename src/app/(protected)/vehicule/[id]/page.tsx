@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink } from "lucide-react";
 import { defaultIllustration } from "@/lib/data/demo";
+import { findVogeManual } from "@/lib/vehicles/voge-manuals";
 import { createClient } from "@/lib/supabase/server";
 import { getVehicleDetail, ensureMaintenancePlanForVehicle } from "@/lib/data/vehicle-repository";
 import { getUserPlanState } from "@/lib/billing/limits";
@@ -51,6 +52,7 @@ export default async function VehicleDetailPage({
 
   const { vehicle, estimatedKm } = detail;
   const title = vehicle.surnom || `${vehicle.marque} ${vehicle.modele}`;
+  const vogeManual = findVogeManual(vehicle.marque, vehicle.modele);
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
@@ -103,6 +105,26 @@ export default async function VehicleDetailPage({
       </div>
 
       <OdometerRefreshHint vehicle={vehicle} />
+
+      {vogeManual ? (
+        <a
+          href={vogeManual.url}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-3 rounded-xl border bg-card p-4 transition-colors hover:bg-accent"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+            <BookOpen className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-medium">Manuel constructeur</span>
+            <span className="block truncate text-sm text-muted-foreground">
+              Voge {vogeManual.label} · notice d&apos;utilisation officielle
+            </span>
+          </span>
+          <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
+        </a>
+      ) : null}
 
       <VehicleCostSummary
         vehicle={vehicle}
