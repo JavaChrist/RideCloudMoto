@@ -17,10 +17,16 @@ export function getSupabaseServiceRoleKey(): string {
 }
 
 export function getSiteUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
-  );
+  // Priorité au domaine public stable (webhooks Mollie, redirections paiement).
+  // On évite VERCEL_URL (*.vercel.app) qui peut être bloqué par la protection
+  // de déploiement et casser la livraison des webhooks / les cookies de session.
+  const configured =
+    process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_PUBLIC_SITE_URL;
+  if (configured && !/localhost|127\.0\.0\.1/i.test(configured)) {
+    return configured.replace(/\/$/, "");
+  }
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
 }
 
 /**

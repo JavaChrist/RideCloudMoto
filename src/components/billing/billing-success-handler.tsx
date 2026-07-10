@@ -17,13 +17,31 @@ export function BillingSuccessHandler() {
     if (done.current) return;
     if (searchParams.get("billing") === "success") {
       done.current = true;
-      fetch("/api/billing/sync", { method: "POST" })
-        .then(() => {
-          toast.success("Merci ! Votre abonnement Premium est actif.");
+      const attempt = async (retriesLeft: number): Promise<void> => {
+        try {
+          const res = await fetch("/api/billing/sync", { method: "POST" });
+          const data = await res.json().catch(() => ({}));
+          if (data?.premium) {
+            toast.success("Merci ! Votre abonnement Premium est actif.");
+            router.replace("/parametres");
+            router.refresh();
+            return;
+          }
+          if (retriesLeft > 0) {
+            // Le paiement peut mettre quelques secondes à être confirmé côté Mollie
+            setTimeout(() => attempt(retriesLeft - 1), 3000);
+            return;
+          }
+          toast.info(
+            "Paiement reçu. L'activation peut prendre un instant — utilisez « Synchroniser » si besoin."
+          );
           router.replace("/parametres");
           router.refresh();
-        })
-        .catch(() => {});
+        } catch {
+          if (retriesLeft > 0) setTimeout(() => attempt(retriesLeft - 1), 3000);
+        }
+      };
+      void attempt(3);
     }
   }, [searchParams, router]);
 

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getMollieClient, formatMollieAmount } from "@/lib/billing/mollie";
-import { PLANS } from "@/lib/billing/plans";
+import { getMollieClient } from "@/lib/billing/mollie";
+import { finalizePremiumSubscription } from "@/lib/billing/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -35,36 +35,17 @@ export async function POST(request: NextRequest) {
     }
 
     const interval = metadata.interval === "yearly" ? "yearly" : "monthly";
-    const price = PLANS.premium.prices[interval]!;
     const customerId = payment.customerId!;
 
     // Création de l'abonnement récurrent après le 1er paiement réussi
     if (metadata.kind === "subscription_setup") {
-      const subscription = await mollie.customerSubscriptions.create({
+      await finalizePremiumSubscription(admin, mollie, {
+        userId,
         customerId,
-        amount: { currency: "EUR", value: formatMollieAmount(price.amount) },
-        interval: interval === "yearly" ? "12 months" : "1 month",
-        description: `RideCloudMoto Premium ${interval}`,
+        interval,
+        mandateId: payment.mandateId ?? null,
         webhookUrl: payment.webhookUrl ?? undefined,
-        metadata: { userId },
       });
-
-      const renews = new Date();
-      if (interval === "yearly") renews.setFullYear(renews.getFullYear() + 1);
-      else renews.setMonth(renews.getMonth() + 1);
-
-      await admin
-        .from("profiles")
-        .update({
-          plan: "premium",
-          plan_status: "active",
-          plan_interval: interval,
-          plan_renews_at: renews.toISOString(),
-          plan_canceled_at: null,
-          mollie_subscription_id: subscription.id,
-          mollie_mandate_id: payment.mandateId ?? null,
-        })
-        .eq("id", userId);
     } else {
       // Paiement récurrent : prolonger la date de renouvellement
       const renews = new Date();
