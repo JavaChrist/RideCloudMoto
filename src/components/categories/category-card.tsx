@@ -13,15 +13,15 @@ interface CategoryCardProps {
 export function CategoryCard({ category, count }: CategoryCardProps) {
   const meta = CATEGORY_META[category];
   return (
-    <Link href={`/vehicules/${category}`} className="group block">
-      <Card className="card-glow flex items-center gap-5 overflow-hidden p-5">
-        <div className="relative flex h-24 w-28 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-transparent ring-glow">
+    <Link href={`/vehicules/${category}`} className="group block w-full max-w-full">
+      <Card className="card-glow flex w-full max-w-full items-center gap-4 overflow-hidden p-4 sm:gap-5 sm:p-5">
+        <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary/15 to-transparent ring-glow sm:w-28">
           <Image
             src={meta.illustration}
             alt={meta.label}
             width={120}
             height={96}
-            className="object-contain drop-shadow-[0_6px_12px_rgba(250,204,21,0.25)] transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-contain drop-shadow-[0_6px_12px_rgba(250,204,21,0.25)] transition-transform duration-300 group-hover:scale-105"
           />
         </div>
         <div className="min-w-0 flex-1">
