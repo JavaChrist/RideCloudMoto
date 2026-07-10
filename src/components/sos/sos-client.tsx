@@ -93,31 +93,46 @@ export function SosClient() {
     if (saved) setPhone(saved);
   }, []);
 
-  // Géolocalisation (toggle)
-  const toggleGeo = useCallback(() => {
-    if (geoEnabled) {
-      if (watchRef.current != null) navigator.geolocation.clearWatch(watchRef.current);
-      watchRef.current = null;
-      setGeoEnabled(false);
-      setUserPos(null);
-      setGeoError(null);
-      return;
-    }
+  // Géolocalisation : le choix de l'utilisateur est mémorisé et réactivé
+  // automatiquement (il reste actif jusqu'à désactivation manuelle).
+  const startGeo = useCallback(() => {
     if (!("geolocation" in navigator)) {
       setGeoError("La géolocalisation n'est pas disponible sur cet appareil.");
       return;
     }
     setGeoError(null);
     setGeoEnabled(true);
+    window.localStorage.setItem("sos_geo", "1");
+    if (watchRef.current != null) navigator.geolocation.clearWatch(watchRef.current);
     watchRef.current = navigator.geolocation.watchPosition(
       (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       () => {
-        setGeoError("Position refusée. Activez la localisation pour voir les SOS près de vous.");
+        setGeoError("Position refusée par le navigateur. Réactivez-la pour voir les SOS proches.");
         setGeoEnabled(false);
+        window.localStorage.setItem("sos_geo", "0");
       },
       { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
     );
-  }, [geoEnabled]);
+  }, []);
+
+  const stopGeo = useCallback(() => {
+    if (watchRef.current != null) navigator.geolocation.clearWatch(watchRef.current);
+    watchRef.current = null;
+    setGeoEnabled(false);
+    setUserPos(null);
+    setGeoError(null);
+    window.localStorage.setItem("sos_geo", "0");
+  }, []);
+
+  const toggleGeo = useCallback(() => {
+    if (geoEnabled) stopGeo();
+    else startGeo();
+  }, [geoEnabled, startGeo, stopGeo]);
+
+  // Réactive la localisation au chargement si elle était activée
+  useEffect(() => {
+    if (window.localStorage.getItem("sos_geo") === "1") startGeo();
+  }, [startGeo]);
 
   useEffect(
     () => () => {
@@ -306,11 +321,11 @@ export function SosClient() {
       ) : (
         <Button
           size="lg"
-          className="h-16 w-full bg-red-600 text-lg font-bold text-white hover:bg-red-700"
+          className="h-auto min-h-16 w-full whitespace-normal px-4 text-center text-base font-bold leading-tight text-white bg-red-600 hover:bg-red-700 sm:text-lg"
           disabled={!geoEnabled || !userPos}
           onClick={() => setConfirmOpen(true)}
         >
-          <TriangleAlert className="mr-2 h-6 w-6" />
+          <TriangleAlert className="mr-2 h-5 w-5 shrink-0" />
           {geoEnabled && userPos ? "Lancer un SOS" : "Activez la localisation pour lancer un SOS"}
         </Button>
       )}

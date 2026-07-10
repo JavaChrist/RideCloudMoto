@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Settings, Store, TriangleAlert } from "lucide-react";
+import { Settings, Store } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -41,9 +41,8 @@ export function ProtectedHeader({
           <Link
             href="/sos"
             aria-label="SOS entraide motard"
-            className="mr-0.5 inline-flex h-9 items-center gap-1.5 rounded-full bg-red-600 px-3 text-xs font-bold uppercase tracking-wide text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 sm:h-10 sm:px-4 sm:text-sm"
+            className="mr-0.5 inline-flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-[11px] font-extrabold uppercase tracking-tight text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 sm:h-10 sm:w-10 sm:text-xs"
           >
-            <TriangleAlert className="h-4 w-4" />
             SOS
           </Link>
           <ThemeToggle />
