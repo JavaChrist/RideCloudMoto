@@ -12,6 +12,7 @@ import {
   Bike,
   X,
   Check,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +31,11 @@ import {
   SOS_RADIUS_KM,
   distanceKm,
 } from "@/lib/sos/sos";
+import {
+  getPushSubscriptionState,
+  isPushSupported,
+  subscribeToPush,
+} from "@/lib/push/client";
 import type { SosKind } from "@/types/database";
 import type { SosMapAlert } from "./sos-map";
 
@@ -87,11 +93,33 @@ export function SosClient() {
   const [phone, setPhone] = useState("");
   const [sending, setSending] = useState(false);
 
+  const [pushOn, setPushOn] = useState<boolean | null>(null);
+
   // Téléphone mémorisé localement pour ré-usage
   useEffect(() => {
     const saved = window.localStorage.getItem("sos_phone");
     if (saved) setPhone(saved);
   }, []);
+
+  // État des notifications push (pour recevoir les réponses au SOS)
+  useEffect(() => {
+    if (!isPushSupported()) {
+      setPushOn(false);
+      return;
+    }
+    getPushSubscriptionState()
+      .then(setPushOn)
+      .catch(() => setPushOn(false));
+  }, []);
+
+  async function enablePush() {
+    try {
+      const ok = await subscribeToPush();
+      setPushOn(ok);
+    } catch {
+      setPushOn(false);
+    }
+  }
 
   // Géolocalisation : le choix de l'utilisateur est mémorisé et réactivé
   // automatiquement (il reste actif jusqu'à désactivation manuelle).
@@ -289,6 +317,18 @@ export function SosClient() {
         </div>
       ) : null}
 
+      {pushOn === false && isPushSupported() ? (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+          <span className="text-muted-foreground">
+            🔔 Active les notifications pour être prévenu quand un motard répond à ton SOS
+            (même app fermée).
+          </span>
+          <Button size="sm" onClick={enablePush}>
+            Activer
+          </Button>
+        </div>
+      ) : null}
+
       {/* Carte — `isolate` crée un contexte d'empilement pour que la carte
           (et les contrôles Leaflet en z-index élevé) restent SOUS les dialogues. */}
       <div className="relative isolate h-72 w-full overflow-hidden rounded-xl border sm:h-96">
@@ -307,13 +347,18 @@ export function SosClient() {
             <p className="font-semibold text-red-800 dark:text-red-200">
               🔴 Ton SOS est actif ({SOS_KIND_LABELS[myActive.kind]})
             </p>
-            <p className="text-muted-foreground">Les motards proches sont prévenus.</p>
+            <p className="text-muted-foreground">
+              Les motards proches sont prévenus. Ouvre le chat pour voir qui arrive.
+            </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" onClick={() => setSelectedId(myActive.id)}>
+              <MessageCircle className="mr-1 h-4 w-4" /> Voir le chat
+            </Button>
             <Button size="sm" variant="outline" onClick={() => closeAlert("cancelled")}>
               <X className="mr-1 h-4 w-4" /> Annuler
             </Button>
-            <Button size="sm" onClick={() => closeAlert("resolved")}>
+            <Button size="sm" variant="outline" onClick={() => closeAlert("resolved")}>
               <Check className="mr-1 h-4 w-4" /> C&apos;est résolu
             </Button>
           </div>
@@ -519,27 +564,33 @@ function SosDetailDialog({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex flex-wrap gap-2">
-              <Button className="flex-1" onClick={() => post("coming")} disabled={busy}>
-                <Bike className="mr-1 h-4 w-4" /> J&apos;arrive !
-              </Button>
-              {alert.contact_phone ? (
+            {alert.is_mine ? (
+              <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">
+                C&apos;est ton alerte. Les motards qui arrivent répondront ici — reste joignable.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <Button className="flex-1" onClick={() => post("coming")} disabled={busy}>
+                  <Bike className="mr-1 h-4 w-4" /> J&apos;arrive !
+                </Button>
+                {alert.contact_phone ? (
+                  <Button variant="outline" asChild className="flex-1">
+                    <a href={`tel:${alert.contact_phone}`}>
+                      <Phone className="mr-1 h-4 w-4" /> Appeler
+                    </a>
+                  </Button>
+                ) : null}
                 <Button variant="outline" asChild className="flex-1">
-                  <a href={`tel:${alert.contact_phone}`}>
-                    <Phone className="mr-1 h-4 w-4" /> Appeler
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${alert.latitude},${alert.longitude}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <MapPin className="mr-1 h-4 w-4" /> Itinéraire
                   </a>
                 </Button>
-              ) : null}
-              <Button variant="outline" asChild className="flex-1">
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${alert.latitude},${alert.longitude}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <MapPin className="mr-1 h-4 w-4" /> Itinéraire
-                </a>
-              </Button>
-            </div>
+              </div>
+            )}
 
             {/* Chat */}
             <div className="max-h-60 space-y-2 overflow-y-auto rounded-lg border bg-muted/30 p-3">
