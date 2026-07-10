@@ -12,25 +12,38 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const BUCKET = "ridecloudmoto-files";
 const MAX_SIZE = 10 * 1024 * 1024;
+/** Nombre de documents inclus par véhicule dans l'offre gratuite. */
+const FREE_DOC_LIMIT = 1;
 
 export function DocumentsList({
   vehicleId,
   userId,
   documents,
-  canUpload,
+  isPremium,
+  hasAccess,
+  isReadOnly,
 }: {
   vehicleId: string;
   userId: string;
   documents: VehicleDocument[];
-  canUpload: boolean;
+  isPremium: boolean;
+  hasAccess: boolean;
+  isReadOnly: boolean;
 }) {
   const confirm = useConfirm();
   const [uploading, setUploading] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  const atFreeLimit = !isPremium && documents.length >= FREE_DOC_LIMIT;
+  const canUpload = hasAccess && !isReadOnly && (isPremium || !atFreeLimit);
+
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!isPremium && documents.length >= FREE_DOC_LIMIT) {
+      toast.error("Limite gratuite atteinte (1 document). Passez en Premium pour un stockage illimité.");
+      return;
+    }
     if (file.size > MAX_SIZE) {
       toast.error("Fichier trop volumineux (10 Mo max).");
       return;
@@ -84,7 +97,7 @@ export function DocumentsList({
   return (
     <div className="space-y-3">
       {canUpload ? (
-        <div className="flex justify-end">
+        <div className="flex flex-col items-end gap-1">
           <input
             ref={inputRef}
             type="file"
@@ -96,10 +109,23 @@ export function DocumentsList({
             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Importer un document
           </Button>
+          {!isPremium ? (
+            <p className="text-xs text-muted-foreground">
+              1 document inclus (gratuit). Passez en Premium pour un stockage illimité.
+            </p>
+          ) : null}
         </div>
+      ) : isReadOnly ? (
+        <p className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
+          Compte en lecture seule : consultation et export possibles, ajout de documents désactivé.
+        </p>
+      ) : atFreeLimit ? (
+        <p className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
+          Limite gratuite atteinte (1 document par véhicule). Passez en Premium pour un stockage illimité.
+        </p>
       ) : (
         <p className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
-          L&apos;import de documents (factures, carte grise…) est réservé au Premium.
+          L&apos;import de documents (factures, carte grise…) nécessite un accès actif.
         </p>
       )}
 
@@ -121,9 +147,11 @@ export function DocumentsList({
                   </span>
                   <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
                 </button>
-                <Button variant="ghost" size="icon" aria-label="Supprimer" onClick={() => handleDelete(doc)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                {!isReadOnly ? (
+                  <Button variant="ghost" size="icon" aria-label="Supprimer" onClick={() => handleDelete(doc)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                ) : null}
               </CardContent>
             </Card>
           ))}

@@ -149,9 +149,11 @@ export async function updateKilometrage(
   vehicleId: string,
   kilometrage: number
 ): Promise<ActionResult> {
-  const { supabase, userId, canWrite, reason } = await getWriteGuard();
+  // Exception : la mise à jour du kilométrage reste autorisée même en lecture
+  // seule (offre expirée), pour permettre un suivi minimal de l'usage.
+  const { supabase, userId, canWrite, isReadOnly, reason } = await getWriteGuard();
   if (!userId) return { ok: false, error: "Non authentifié" };
-  if (!canWrite) return { ok: false, error: reason ?? "Action non autorisée" };
+  if (!canWrite && !isReadOnly) return { ok: false, error: reason ?? "Action non autorisée" };
 
   const { error } = await supabase
     .from("vehicles")

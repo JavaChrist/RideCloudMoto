@@ -46,7 +46,8 @@ export default async function VehicleDetailPage({
     .select("*")
     .eq("id", user!.id)
     .maybeSingle();
-  const isPremium = getUserPlanState(profile as Profile).effectivePlan === "premium";
+  const planState = getUserPlanState(profile as Profile);
+  const isPremium = planState.effectivePlan === "premium";
 
   const { vehicle, estimatedKm } = detail;
   const title = vehicle.surnom || `${vehicle.marque} ${vehicle.modele}`;
@@ -61,7 +62,7 @@ export default async function VehicleDetailPage({
           </Link>
         </Button>
         <div className="flex items-center gap-1">
-          <PrintExportButton vehicleId={vehicle.id} canExport={isPremium} />
+          <PrintExportButton vehicleId={vehicle.id} isPremium={isPremium} />
           <VehicleActions vehicleId={vehicle.id} category={vehicle.category} title={title} />
         </div>
       </div>
@@ -120,6 +121,8 @@ export default async function VehicleDetailPage({
         documents={detail.documents}
         currentKm={estimatedKm}
         isPremium={isPremium}
+        hasAccess={planState.hasAccess}
+        isReadOnly={planState.isReadOnly}
       />
     </div>
   );

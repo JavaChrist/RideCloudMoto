@@ -62,8 +62,9 @@ export function SubscriptionSection({ profile }: { profile: Profile }) {
         <CardContent className="space-y-4">
           {state.isDealerOffer ? (
             <p className="text-sm text-muted-foreground">
-              Offre gratuite concessionnaire · 1 véhicule. Sans abonnement Premium à l&apos;échéance,
-              l&apos;accès à l&apos;application sera suspendu.
+              Offre gratuite concessionnaire · 1 véhicule. À l&apos;échéance, sans abonnement Premium,
+              votre compte passe en lecture seule : vous gardez l&apos;accès à votre historique
+              (consultation et export), mais vous ne pouvez plus le modifier.
             </p>
           ) : state.effectivePlan === "premium" ? (
             <p className="flex items-center gap-2 text-sm">

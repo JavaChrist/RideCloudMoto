@@ -14,17 +14,17 @@ import {
 
 export function PrintExportButton({
   vehicleId,
-  canExport,
+  isPremium,
 }: {
   vehicleId: string;
-  canExport: boolean;
+  isPremium: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState<string | null>(null);
 
   async function download(kind: "json" | "zip") {
-    if (!canExport) {
-      toast.error("L'export est réservé au Premium.");
+    if (kind === "zip" && !isPremium) {
+      toast.error("L'archive ZIP (avec documents) est réservée au Premium.");
       return;
     }
     setLoading(kind);
@@ -65,18 +65,24 @@ export function PrintExportButton({
             {loading === "json" ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileJson className="h-4 w-4" />}
             Données JSON
           </Button>
-          <Button variant="outline" className="w-full justify-start" onClick={() => download("zip")} disabled={!!loading}>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => download("zip")}
+            disabled={!!loading || !isPremium}
+          >
             {loading === "zip" ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileArchive className="h-4 w-4" />}
             Archive ZIP (données + documents)
+            {!isPremium ? <span className="ml-auto text-xs text-muted-foreground">Premium</span> : null}
           </Button>
           <Button variant="outline" className="w-full justify-start" onClick={() => window.print()}>
             <Printer className="h-4 w-4" />
             Imprimer / PDF
           </Button>
         </div>
-        {!canExport ? (
+        {!isPremium ? (
           <p className="text-center text-xs text-muted-foreground">
-            Export réservé au Premium.
+            Export JSON inclus dans l&apos;offre gratuite · l&apos;archive ZIP nécessite le Premium.
           </p>
         ) : null}
       </DialogContent>

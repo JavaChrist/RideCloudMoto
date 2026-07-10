@@ -1,4 +1,5 @@
-import { ArrowRight, Car } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 
 const RIDECLOUD_URL = process.env.NEXT_PUBLIC_RIDECLOUD_URL ?? "https://ridecloud.app";
 
@@ -14,8 +15,14 @@ export function RideCloudCrossSell() {
       rel="noopener noreferrer"
       className="card-glow group flex items-center gap-3 rounded-xl border bg-card/60 p-4"
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-        <Car className="h-5 w-5 text-muted-foreground" />
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
+        <Image
+          src="/ridecloud-logo.png"
+          alt="RideCloud"
+          width={40}
+          height={40}
+          className="h-full w-full object-contain p-1"
+        />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold">

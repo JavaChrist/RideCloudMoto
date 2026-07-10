@@ -36,6 +36,8 @@ interface Props {
   documents: VehicleDocument[];
   currentKm: number;
   isPremium: boolean;
+  hasAccess: boolean;
+  isReadOnly: boolean;
 }
 
 export function VehicleDetailTabs({
@@ -47,6 +49,8 @@ export function VehicleDetailTabs({
   documents,
   currentKm,
   isPremium,
+  hasAccess,
+  isReadOnly,
 }: Props) {
   const [tab, setTab] = useState<SectionValue>("plan");
 
@@ -103,7 +107,9 @@ export function VehicleDetailTabs({
           vehicleId={vehicle.id}
           userId={userId}
           documents={documents}
-          canUpload={isPremium}
+          isPremium={isPremium}
+          hasAccess={hasAccess}
+          isReadOnly={isReadOnly}
         />
       </TabsContent>
     </Tabs>

@@ -194,7 +194,9 @@ export function AddVehicleForm({
 
           {/* Modèle */}
           <div className="space-y-2">
-            <Label htmlFor="modele">Modèle</Label>
+            <Label htmlFor="modele">
+              Modèle <span className="text-destructive">*</span>
+            </Label>
             <select
               id="modele"
               value={modele}
@@ -212,9 +214,11 @@ export function AddVehicleForm({
           </div>
 
           {/* Année + Kilométrage */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="annee">Année</Label>
+              <Label htmlFor="annee">
+                Année <span className="text-destructive">*</span>
+              </Label>
               {availableYears.length > 0 ? (
                 <select id="annee" name="annee" required className={selectClass}>
                   {[...availableYears].reverse().map((y) => (
@@ -228,7 +232,9 @@ export function AddVehicleForm({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="kilometrage">Kilométrage</Label>
+              <Label htmlFor="kilometrage">
+                Kilométrage <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="kilometrage"
                 name="kilometrage"
@@ -241,7 +247,7 @@ export function AddVehicleForm({
           </div>
 
           {/* Carburant + Usage */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="carburant">Carburant</Label>
               <select id="carburant" name="carburant" defaultValue="essence" className={selectClass}>
@@ -271,7 +277,7 @@ export function AddVehicleForm({
           <p className="-mt-3 text-xs text-muted-foreground">{USAGE_PROFILE_DESCRIPTIONS[usage]}</p>
 
           {/* Détails optionnels */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="surnom">Surnom (optionnel)</Label>
               <Input id="surnom" name="surnom" placeholder="Ma trail" />
@@ -281,7 +287,7 @@ export function AddVehicleForm({
               <Input id="immatriculation" name="immatriculation" placeholder="AA-123-BB" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="date_achat">Date d&apos;achat</Label>
               <Input id="date_achat" name="date_achat" type="date" />
@@ -291,6 +297,10 @@ export function AddVehicleForm({
               <Input id="date_mise_en_circulation" name="date_mise_en_circulation" type="date" />
             </div>
           </div>
+
+          <p className="text-xs text-muted-foreground">
+            <span className="text-destructive">*</span> Champs obligatoires.
+          </p>
 
           <Button type="submit" className="w-full" disabled={loading || !modele}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ajouter le véhicule"}

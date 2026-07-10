@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getVehicleDetail } from "@/lib/data/vehicle-repository";
-import { getUserPlanState } from "@/lib/billing/limits";
-import type { Profile } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
+// L'export JSON (portabilité des données) est disponible pour tous les comptes,
+// y compris l'offre gratuite et le mode lecture seule. Seul l'export ZIP est Premium.
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,15 +16,6 @@ export async function GET(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (getUserPlanState(profile as Profile).effectivePlan !== "premium") {
-    return NextResponse.json({ error: "Premium requis" }, { status: 403 });
-  }
 
   const detail = await getVehicleDetail(supabase, user.id, id);
   if (!detail) return NextResponse.json({ error: "Introuvable" }, { status: 404 });

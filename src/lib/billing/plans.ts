@@ -24,9 +24,11 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     maxVehicles: 1,
     features: [
       "1 véhicule",
-      "Carnet d'entretien",
-      "Historique illimité",
-      "Rappels manuels",
+      "Entretiens illimités",
+      "Rappels intelligents",
+      "1 document par véhicule",
+      "Export JSON",
+      "PWA installable",
     ],
   },
   premium: {
@@ -40,11 +42,11 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     maxVehicles: 5,
     features: [
       "Jusqu'à 5 véhicules",
-      "Plan d'entretien constructeur",
-      "Rappels automatiques + notifications push",
-      "Fiches techniques & notices",
-      "Export PDF / ZIP / JSON",
-      "Estimation kilométrique intelligente",
+      "Documents illimités",
+      "Plan d'entretien intelligent",
+      "Export PDF, JSON, ZIP",
+      "Passeport numérique pour la revente",
+      "Support prioritaire",
     ],
   },
 };
