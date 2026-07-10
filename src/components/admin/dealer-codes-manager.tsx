@@ -194,9 +194,6 @@ export function DealerCodesManager({ siteUrl }: DealerCodesManagerProps) {
             <Button variant="outline" size="sm" asChild>
               <Link href="/admin/dealers">Concessionnaires →</Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/parametres">← Paramètres</Link>
-            </Button>
           </div>
         </div>
 
