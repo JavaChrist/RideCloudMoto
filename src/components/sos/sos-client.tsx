@@ -219,12 +219,19 @@ export function SosClient() {
 
   async function closeAlert(status: "resolved" | "cancelled") {
     if (!myActive) return;
-    await fetch(`/api/sos/${myActive.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    await loadAlerts();
+    const closedId = myActive.id;
+    // Retrait optimiste : le point disparaît immédiatement de la carte et de la liste
+    setAlerts((prev) => prev.filter((a) => a.id !== closedId));
+    if (selectedId === closedId) setSelectedId(null);
+    try {
+      await fetch(`/api/sos/${closedId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+    } finally {
+      await loadAlerts();
+    }
   }
 
   return (
@@ -267,8 +274,9 @@ export function SosClient() {
         </div>
       ) : null}
 
-      {/* Carte */}
-      <div className="h-72 w-full overflow-hidden rounded-xl border sm:h-96">
+      {/* Carte — `isolate` crée un contexte d'empilement pour que la carte
+          (et les contrôles Leaflet en z-index élevé) restent SOUS les dialogues. */}
+      <div className="relative isolate h-72 w-full overflow-hidden rounded-xl border sm:h-96">
         <SosMap
           center={mapCenter}
           userPos={userPos}

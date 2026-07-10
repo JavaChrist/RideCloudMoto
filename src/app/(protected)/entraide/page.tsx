@@ -44,6 +44,10 @@ const GOLDEN_RULES: { title: string; text: string }[] = [
     title: "L'entraide avant tout",
     text: "Un motard arrêté sur le bas-côté, on ralentit, on vérifie. Aujourd'hui c'est lui, demain ce sera toi. C'est tout l'esprit du bouton SOS de l'app.",
   },
+  {
+    title: "Dire merci, rester courtois",
+    text: "Quand une voiture se pousse ou s'écarte pour te laisser passer, on remercie : jambe (ou pied) tendue sur le côté. Le respect partagé, c'est ce qui rend la route plus sûre pour tous.",
+  },
 ];
 
 const SIGNALS: { sign: string; meaning: string }[] = [
@@ -64,7 +68,16 @@ const SIGNALS: { sign: string; meaning: string }[] = [
     meaning: "Je vais m'arrêter / stop. Préviens ceux qui te suivent.",
   },
   {
-    sign: "Jambe tendue ou pied qui remue",
+    sign: "Jambe (ou pied) tendue sur le côté",
+    meaning:
+      "Merci ! Remerciement au conducteur qui se pousse ou s'écarte pour te laisser passer. Le geste le plus courant : on sort la jambe côté véhicule remercié.",
+  },
+  {
+    sign: "Feux de détresse / warnings brefs",
+    meaning: "Merci à une voiture qui s'écarte, ou signale un danger/ralentissement.",
+  },
+  {
+    sign: "Pied qui remue de haut en bas",
     meaning: "Problème mécanique ou besoin de s'arrêter (essence, fatigue…).",
   },
   {
