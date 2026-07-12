@@ -55,6 +55,11 @@ export function DealerLicensesTable() {
       toast.success(
         `Licence prolongée jusqu'au ${formatDateShort(new Date(data.until))}`
       );
+      setCodes((prev) =>
+        prev.map((c) =>
+          c.id === codeId ? { ...c, extended_at: new Date().toISOString() } : c
+        )
+      );
     } catch {
       toast.error("Erreur réseau");
     } finally {
@@ -139,19 +144,23 @@ export function DealerLicensesTable() {
                       </td>
                       <td className="p-3 text-right">
                         {isUsed ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleExtend(row.id)}
-                            disabled={extendingId === row.id}
-                          >
-                            {extendingId === row.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Sparkles className="h-4 w-4" />
-                            )}
-                            Prolonger
-                          </Button>
+                          row.extended_at ? (
+                            <Badge variant="secondary">Prolongée</Badge>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleExtend(row.id)}
+                              disabled={extendingId === row.id}
+                            >
+                              {extendingId === row.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Sparkles className="h-4 w-4" />
+                              )}
+                              Prolonger
+                            </Button>
+                          )
                         ) : (
                           <span className="text-xs text-muted-foreground">
                             En attente d&apos;activation

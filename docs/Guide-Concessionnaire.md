@@ -75,6 +75,8 @@ Pour une licence **activée**, le bouton **Prolonger** ajoute une nouvelle péri
 - si l'offre est encore active → la période s'ajoute à la date de fin ;
 - si l'offre a expiré → elle repart d'aujourd'hui.
 
+> **Une seule prolongation par licence.** Une fois la licence prolongée, le bouton est remplacé par la mention **Prolongée** et ne peut plus être réutilisé.
+
 **Cas d'usage** : offrir une année supplémentaire après une révision à l'atelier, pour encourager le client à revenir.
 
 ---

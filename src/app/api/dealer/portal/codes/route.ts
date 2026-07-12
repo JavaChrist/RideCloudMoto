@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   let query = ctx.admin
     .from("dealer_activation_codes")
     .select(
-      "id, code, dealer_name, customer_first_name, customer_last_name, customer_email, customer_phone, vehicle_model, purchase_date, used_by, used_at, expires_at, created_at"
+      "id, code, dealer_name, customer_first_name, customer_last_name, customer_email, customer_phone, vehicle_model, purchase_date, used_by, used_at, expires_at, extended_at, created_at"
     )
     .eq("dealer_id", ctx.membership.dealerId)
     .order("created_at", { ascending: false })

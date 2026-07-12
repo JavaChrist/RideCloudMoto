@@ -355,6 +355,7 @@ CREATE TABLE IF NOT EXISTS public.dealer_activation_codes (
   used_by             uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   used_at             timestamptz,
   expires_at          timestamptz,
+  extended_at         timestamptz,
   created_at          timestamptz NOT NULL DEFAULT now()
 );
 

@@ -228,5 +228,6 @@ export interface DealerActivationCode {
   used_by: string | null;
   used_at: string | null;
   expires_at: string | null;
+  extended_at: string | null;
   created_at: string;
 }

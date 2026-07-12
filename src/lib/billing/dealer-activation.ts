@@ -217,7 +217,7 @@ export async function extendDealerLicense(
 ): Promise<{ ok: true; until: string } | { ok: false; error: string }> {
   const { data: row } = await admin
     .from("dealer_activation_codes")
-    .select("id, dealer_id, used_by")
+    .select("id, dealer_id, used_by, extended_at")
     .eq("id", codeId)
     .maybeSingle();
 
@@ -226,6 +226,9 @@ export async function extendDealerLicense(
   }
   if (!row.used_by) {
     return { ok: false, error: "Cette licence n'a pas encore été activée par le client." };
+  }
+  if (row.extended_at) {
+    return { ok: false, error: "Cette licence a déjà été prolongée une fois." };
   }
 
   let months = extraMonths && extraMonths > 0 ? Math.round(extraMonths) : 0;
@@ -260,6 +263,11 @@ export async function extendDealerLicense(
   if (error) {
     return { ok: false, error: "Impossible de prolonger la licence." };
   }
+
+  await admin
+    .from("dealer_activation_codes")
+    .update({ extended_at: new Date().toISOString() })
+    .eq("id", codeId);
 
   return { ok: true, until: untilIso };
 }
