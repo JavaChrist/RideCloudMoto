@@ -10,10 +10,16 @@ import { Button } from "@/components/ui/button";
 interface DealerFlyerPrintProps {
   code: string;
   dealerName: string | null;
+  dealerLogoUrl?: string | null;
   siteUrl: string;
 }
 
-export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrintProps) {
+export function DealerFlyerPrint({
+  code,
+  dealerName,
+  dealerLogoUrl = null,
+  siteUrl,
+}: DealerFlyerPrintProps) {
   const registerUrl = buildRegisterUrl(code, siteUrl);
   const [qrUrl, setQrUrl] = React.useState<string | null>(null);
 
@@ -61,9 +67,18 @@ export function DealerFlyerPrint({ code, dealerName, siteUrl }: DealerFlyerPrint
                 </div>
               </div>
             </div>
-            <span className="rounded-full border border-amber-400/40 bg-white/10 px-3 py-1 text-xs">
-              Offre concessionnaire
-            </span>
+            {dealerLogoUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={dealerLogoUrl}
+                alt={dealerName ?? "Concessionnaire"}
+                className="h-14 w-auto max-w-[140px] rounded-lg bg-white object-contain p-1.5 shadow-sm"
+              />
+            ) : (
+              <span className="rounded-full border border-amber-400/40 bg-white/10 px-3 py-1 text-xs">
+                Offre concessionnaire
+              </span>
+            )}
           </div>
           <h1 className="max-w-xl text-[2rem] font-extrabold leading-tight tracking-tight">
             La vie de votre deux-roues, enfin dans le cloud.
