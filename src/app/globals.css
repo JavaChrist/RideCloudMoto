@@ -115,11 +115,19 @@
     text-wrap: balance;
   }
   .brand-gradient {
-    background-image: linear-gradient(135deg, hsl(45 96% 52%) 0%, hsl(38 92% 48%) 100%);
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      color-mix(in srgb, hsl(var(--primary)), #000 16%) 100%
+    );
   }
-  /* Bouton/élément dégradé doré de la marque */
+  /* Bouton/élément dégradé aux couleurs de la marque (suit --primary) */
   .brand-gradient-text {
-    background-image: linear-gradient(135deg, hsl(45 96% 55%), hsl(38 92% 50%));
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      color-mix(in srgb, hsl(var(--primary)), #000 12%)
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
