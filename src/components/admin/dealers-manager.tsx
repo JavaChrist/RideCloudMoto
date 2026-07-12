@@ -24,6 +24,7 @@ interface DealerFormState {
   name: string;
   slug: string;
   logo_url: string;
+  app_logo_url: string;
   primary_color: string;
   secondary_color: string;
   address: string;
@@ -46,6 +47,7 @@ const EMPTY_FORM: DealerFormState = {
   name: "",
   slug: "",
   logo_url: "",
+  app_logo_url: "",
   primary_color: "",
   secondary_color: "",
   address: "",
@@ -69,6 +71,7 @@ function dealerToForm(d: Dealer): DealerFormState {
     name: d.name ?? "",
     slug: d.slug ?? "",
     logo_url: d.logo_url ?? "",
+    app_logo_url: d.app_logo_url ?? "",
     primary_color: d.primary_color ?? "",
     secondary_color: d.secondary_color ?? "",
     address: d.address ?? "",
@@ -157,6 +160,7 @@ export function DealersManager() {
           name: form.name.trim(),
           slug: form.slug.trim() || undefined,
           logo_url: form.logo_url.trim(),
+          app_logo_url: form.app_logo_url.trim(),
           primary_color: form.primary_color.trim(),
           secondary_color: form.secondary_color.trim(),
           address: form.address.trim(),
@@ -264,13 +268,28 @@ export function DealersManager() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="d-logo">Logo (URL)</Label>
+                  <Label htmlFor="d-logo">Logo concessionnaire (URL)</Label>
                   <Input
                     id="d-logo"
                     value={form.logo_url}
                     onChange={(e) => set("logo_url", e.target.value)}
                     placeholder="https://…/logo.png"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Affiché sur la page « Mon concessionnaire » et le flyer.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="d-app-logo">Logo app (header, aux couleurs de la marque)</Label>
+                  <Input
+                    id="d-app-logo"
+                    value={form.app_logo_url}
+                    onChange={(e) => set("app_logo_url", e.target.value)}
+                    placeholder="/logo-kawa.png ou https://…/logo.png"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Remplace le logo RideCloudMoto dans le header des clients. Vide = logo par défaut.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="d-brands">Marques distribuées</Label>

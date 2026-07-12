@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.dealers (
   slug             text NOT NULL UNIQUE,
   name             text NOT NULL,
   logo_url         text,
+  app_logo_url     text,
   primary_color    text,
   secondary_color  text,
   address          text,

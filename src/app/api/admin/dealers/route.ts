@@ -92,6 +92,7 @@ export async function POST(request: Request) {
     slug,
     name,
     logo_url: clean(body.logo_url),
+    app_logo_url: clean(body.app_logo_url),
     primary_color: clean(body.primary_color),
     secondary_color: clean(body.secondary_color),
     address: clean(body.address),

@@ -39,6 +39,7 @@ export interface Dealer {
   slug: string;
   name: string;
   logo_url: string | null;
+  app_logo_url: string | null;
   primary_color: string | null;
   secondary_color: string | null;
   address: string | null;

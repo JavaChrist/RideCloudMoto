@@ -15,6 +15,7 @@ interface ProtectedHeaderProps {
   dealerDaysLeft?: number | null;
   hasDealer?: boolean;
   isDealerStaff?: boolean;
+  appLogoUrl?: string | null;
 }
 
 export function ProtectedHeader({
@@ -24,12 +25,13 @@ export function ProtectedHeader({
   dealerDaysLeft,
   hasDealer = false,
   isDealerStaff = false,
+  appLogoUrl = null,
 }: ProtectedHeaderProps) {
   return (
     <header className="safe-area-top safe-area-x fixed inset-x-0 top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-14 min-h-[var(--header-bar-height)] items-center justify-between gap-2 sm:h-16 sm:gap-3">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <Logo size={32} compactOnMobile />
+          <Logo size={32} compactOnMobile src={appLogoUrl} />
           {hasAccess && isDealerOffer ? (
             <Badge variant="warning" className="hidden shrink-0 sm:inline-flex">
               Offert
