@@ -14,6 +14,7 @@ interface ProtectedHeaderProps {
   isDealerOffer: boolean;
   dealerDaysLeft?: number | null;
   hasDealer?: boolean;
+  isDealerStaff?: boolean;
 }
 
 export function ProtectedHeader({
@@ -22,6 +23,7 @@ export function ProtectedHeader({
   isDealerOffer,
   dealerDaysLeft,
   hasDealer = false,
+  isDealerStaff = false,
 }: ProtectedHeaderProps) {
   return (
     <header className="safe-area-top safe-area-x fixed inset-x-0 top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -38,6 +40,19 @@ export function ProtectedHeader({
           ) : null}
         </div>
         <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+          {isDealerStaff ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mr-0.5 h-9 gap-1.5 px-2 sm:h-10 sm:px-3"
+              asChild
+            >
+              <Link href="/portail" aria-label="Retour à l'espace pro">
+                <Store className="h-4 w-4" />
+                <span className="hidden sm:inline">Espace pro</span>
+              </Link>
+            </Button>
+          ) : null}
           <Link
             href="/sos"
             aria-label="SOS entraide motard"

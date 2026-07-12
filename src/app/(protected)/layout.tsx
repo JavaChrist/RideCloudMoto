@@ -5,6 +5,7 @@ import { ensureProfile } from "@/lib/billing/ensure-profile";
 import { ProtectedShell } from "@/components/layout/protected-shell";
 import { isAdminEmail } from "@/lib/admin";
 import { getDealerById } from "@/lib/dealer/dealer-info";
+import { getDealerMembership } from "@/lib/dealer/membership";
 import type { Dealer, Profile } from "@/types/database";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -40,6 +41,9 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 
   const isAdmin = isAdminEmail(user.email);
 
+  const dealerMembership = await getDealerMembership(supabase, user.id);
+  const isDealerStaff = !!dealerMembership;
+
   let dealer: Dealer | null = null;
   const dealerId = (profile as Profile | null)?.dealer_id ?? null;
   if (dealerId) {
@@ -55,6 +59,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
       profile={(profile as Profile) ?? null}
       email={user.email ?? ""}
       isAdmin={isAdmin}
+      isDealerStaff={isDealerStaff}
       dealer={dealer}
     >
       {children}

@@ -11,6 +11,7 @@ interface ProtectedShellProps {
   profile: Profile | null;
   email: string;
   isAdmin?: boolean;
+  isDealerStaff?: boolean;
   dealer?: Dealer | null;
   children: React.ReactNode;
 }
@@ -18,6 +19,7 @@ interface ProtectedShellProps {
 export function ProtectedShell({
   profile,
   isAdmin = false,
+  isDealerStaff = false,
   dealer = null,
   children,
 }: ProtectedShellProps) {
@@ -44,6 +46,7 @@ export function ProtectedShell({
         hasAccess={effectiveAccess}
         dealerDaysLeft={state?.dealerDaysLeft ?? null}
         hasDealer={!!dealer}
+        isDealerStaff={isDealerStaff}
       />
       <div className="header-spacer" aria-hidden />
       {isReadOnly ? <ReadOnlyBanner /> : null}
