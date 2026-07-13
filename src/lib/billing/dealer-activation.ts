@@ -2,6 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 const DEALER_FREE_MONTHS = Number(process.env.DEALER_FREE_PREMIUM_MONTHS ?? 12);
 
+/** Durée maximale (en mois) d'une prolongation de licence, pour éviter les abus. */
+const MAX_EXTENSION_MONTHS = 36;
+
 /** Code normalisé : 2 lettres + 3 chiffres + 2 lettres (ex. AB123CD). */
 export const PLATE_CODE_REGEX = /^[A-HJ-NP-TV-Z]{2}\d{3}[A-HJ-NP-TV-Z]{2}$/;
 
@@ -240,6 +243,8 @@ export async function extendDealerLicense(
       .maybeSingle();
     months = dealer?.offer_months && Number(dealer.offer_months) > 0 ? Number(dealer.offer_months) : DEALER_FREE_MONTHS;
   }
+  // Plafonne la durée pour empêcher une prolongation abusive (ex. months=99999).
+  months = Math.min(months, MAX_EXTENSION_MONTHS);
 
   const { data: profile } = await admin
     .from("profiles")

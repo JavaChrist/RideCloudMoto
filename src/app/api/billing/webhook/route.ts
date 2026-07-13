@@ -37,6 +37,22 @@ export async function POST(request: NextRequest) {
     const interval = metadata.interval === "yearly" ? "yearly" : "monthly";
     const customerId = payment.customerId!;
 
+    // Corrélation de sécurité : le client Mollie du paiement doit correspondre
+    // au client enregistré sur le profil ciblé (sinon métadonnées suspectes).
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("mollie_customer_id")
+      .eq("id", userId)
+      .maybeSingle();
+    if (
+      profile?.mollie_customer_id &&
+      customerId &&
+      profile.mollie_customer_id !== customerId
+    ) {
+      console.error("[billing/webhook] customerId mismatch", { userId, customerId });
+      return NextResponse.json({ ok: true });
+    }
+
     // Création de l'abonnement récurrent après le 1er paiement réussi
     if (metadata.kind === "subscription_setup") {
       await finalizePremiumSubscription(admin, mollie, {

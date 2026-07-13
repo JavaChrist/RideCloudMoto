@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { estimateCurrentKm } from "@/lib/odometer-estimate";
+import { getWriteGuard } from "@/lib/billing/write-guard";
 import type { Vehicle } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -14,17 +14,15 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  const { supabase, userId, canWrite, reason } = await getWriteGuard();
+  if (!userId) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  if (!canWrite) return NextResponse.json({ error: reason }, { status: 403 });
 
   const { data: vehicle } = await supabase
     .from("vehicles")
     .select("*")
     .eq("id", id)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
   if (!vehicle) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
 

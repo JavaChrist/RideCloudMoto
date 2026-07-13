@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RideCloudMoto — Présentation Concessionnaire</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #FACC15;
+    --gold-dark: #CA8A04;
+    --gold-light: #FEF9C3;
+    --ink: #0a0a0a;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --card: #ffffff;
+    --soft: #f8fafc;
+  }
+
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: #e2e8f0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 12px auto;
+    background: var(--card);
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+
+  .pad { height: 297mm; padding: 14mm 18mm; display: flex; flex-direction: column; }
+
+  /* ── Brand header ── */
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 54px; height: 54px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+  .brand-name { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+  .brand-name span { color: var(--gold-dark); }
+  .brand-tagline { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 2px; }
+
+  /* ══════════ COVER ══════════ */
+  .cover {
+    color: #fff; min-height: 287mm; display: flex; flex-direction: column;
+    padding: 20mm 18mm;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% -8%, rgba(250, 204, 21, 0.25), transparent 62%),
+      linear-gradient(160deg, #262626 0%, var(--ink) 44%, #1c1400 100%);
+  }
+  .cover .brand-name { color: #fff; }
+  .cover .brand-name span { color: var(--gold); }
+  .cover .brand-tagline { color: rgba(250, 204, 21, 0.85); }
+  .cover-badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 15px; border-radius: 999px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(250, 204, 21, 0.4);
+    font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.92); white-space: nowrap;
+    align-self: flex-start; margin-top: 40px;
+  }
+  .cover-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  .cover-spacer { flex: 1; }
+  .cover-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+  .cover-title { font-size: 46px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.06; max-width: 560px; margin-bottom: 20px; }
+  .cover-title span { color: var(--gold); }
+  .cover-sub { font-size: 16px; line-height: 1.65; color: rgba(255,255,255,0.8); max-width: 500px; margin-bottom: 34px; }
+  .cover-pills { display: flex; flex-wrap: wrap; gap: 9px; }
+  .cover-pill {
+    display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 999px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.16);
+    font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.9);
+  }
+  .cover-pill svg { width: 15px; height: 15px; opacity: 0.9; }
+  .cover-foot { margin-top: 46px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,0.14); display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+  .cover-foot .who { font-size: 13px; color: rgba(255,255,255,0.72); line-height: 1.6; }
+  .cover-foot .who strong { color: #fff; font-weight: 700; }
+  .cover-foot .site { font-size: 13px; font-weight: 700; color: var(--gold); }
+
+  /* ── Section titles ── */
+  .kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-dark); margin-bottom: 8px; }
+  .h1 { font-size: 27px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.12; margin-bottom: 7px; }
+  .lead { font-size: 13.5px; line-height: 1.6; color: var(--muted); max-width: 640px; }
+  .section { margin-top: 20px; }
+  .section-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .section-num {
+    width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
+    background: var(--gold-light); border: 1px solid #fde68a; color: var(--gold-dark);
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;
+  }
+
+  /* ── Value cards ── */
+  .value-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .value {
+    padding: 13px 16px; border-radius: 14px; background: var(--soft); border: 1px solid var(--border);
+  }
+  .value-icon {
+    width: 34px; height: 34px; border-radius: 10px; background: var(--gold-light); border: 1px solid #fde68a;
+    display: flex; align-items: center; justify-content: center; color: var(--gold-dark); margin-bottom: 9px;
+  }
+  .value-icon svg { width: 19px; height: 19px; }
+  .value-title { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
+  .value-text { font-size: 12px; line-height: 1.55; color: var(--muted); }
+
+  /* ── Flow ── */
+  .flow { display: flex; flex-direction: column; gap: 7px; }
+  .flow-step { display: flex; gap: 14px; align-items: flex-start; padding: 11px 16px; border-radius: 12px; background: #fff; border: 1px solid var(--border); }
+  .flow-num {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--gold), #EAB308); color: var(--ink);
+    display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800;
+  }
+  .flow-body { padding-top: 3px; }
+  .flow-title { font-size: 13.5px; font-weight: 700; margin-bottom: 2px; }
+  .flow-text { font-size: 12px; line-height: 1.5; color: var(--muted); }
+  .flow-text strong { color: var(--text); font-weight: 600; }
+
+  /* ── Callout ── */
+  .callout {
+    margin-top: 14px; padding: 13px 18px; border-radius: 12px;
+    background: var(--gold-light); border: 1px solid #fde68a;
+    font-size: 12.5px; line-height: 1.55; color: #713f12;
+  }
+  .callout strong { color: #854d0e; font-weight: 700; }
+
+  /* ── Portal blocks ── */
+  .portal-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .portal {
+    padding: 16px; border-radius: 16px; background: var(--soft); border: 1px solid var(--border);
+  }
+  .portal-tag { display:inline-block; padding: 3px 9px; border-radius: 999px; background: #fff; border: 1px solid var(--border); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold-dark); margin-bottom: 10px; }
+  .portal-title { font-size: 13.5px; font-weight: 700; margin-bottom: 5px; }
+  .portal-text { font-size: 11.5px; line-height: 1.5; color: var(--muted); }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  th, td { text-align: left; padding: 10px 14px; font-size: 12.5px; border-bottom: 1px solid var(--border); }
+  th { background: var(--ink); color: #fff; font-weight: 600; }
+  th:first-child { border-top-left-radius: 10px; }
+  th:last-child { border-top-right-radius: 10px; }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--text); }
+  .badge-on { display: inline-block; padding: 2px 9px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 700; }
+  .badge-wait { display: inline-block; padding: 2px 9px; border-radius: 999px; background: #fef9c3; color: #854d0e; font-size: 11px; font-weight: 700; }
+
+  /* ── Vitrine list ── */
+  .vitrine { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 22px; margin-top: 4px; }
+  .vitrine-item { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.5; color: var(--text); }
+  .vitrine-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--gold-dark); margin-top: 2px; }
+
+  /* ── FAQ ── */
+  .faq { display: flex; flex-direction: column; gap: 10px; }
+  .faq-item { padding: 13px 16px; border-radius: 12px; background: var(--soft); border: 1px solid var(--border); }
+  .faq-q { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .faq-q::before { content: "Q "; color: var(--gold-dark); font-weight: 800; }
+  .faq-a { font-size: 12px; line-height: 1.55; color: var(--muted); }
+
+  /* ── Summary ── */
+  .summary {
+    margin-top: 22px; padding: 22px 24px; border-radius: 18px; color: #fff;
+    background: linear-gradient(160deg, #262626 0%, var(--ink) 100%);
+    border: 1px solid var(--gold);
+  }
+  .summary-quote { font-size: 15px; line-height: 1.6; font-style: italic; color: rgba(255,255,255,0.92); margin-bottom: 18px; }
+  .summary-quote strong { color: var(--gold); font-style: normal; }
+  .summary-args { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .summary-arg { padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(250,204,21,0.25); }
+  .summary-arg .n { font-size: 20px; font-weight: 800; color: var(--gold); margin-bottom: 5px; }
+  .summary-arg .t { font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.85); }
+
+  /* ── Footer ── */
+  .foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+  .foot-brand { display: flex; align-items: center; gap: 10px; }
+  .foot-mark { width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; }
+  .foot-mark img { width: 100%; height: 100%; object-fit: contain; }
+  .foot-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .foot-role { font-size: 11px; color: var(--muted); }
+  .foot-links { text-align: right; font-size: 12px; line-height: 1.7; }
+  .foot-links a { color: var(--gold-dark); font-weight: 600; text-decoration: none; }
+  .foot-links span { color: var(--muted); }
+
+  @media print {
+    html, body { background: #fff; margin: 0; padding: 0; }
+    .page { box-shadow: none !important; margin: 0 !important; }
+    .cover, .brand-mark, .foot-mark, .flow-num, .summary, .value-icon, .portal-tag, th, .summary-arg,
+    .cover-badge, .cover-pill, .badge-on, .badge-wait, .callout, .value, .portal {
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ PAGE 1 — COUVERTURE ══════════════════ -->
+<section class="page cover">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <img src="../public/logo256.png" alt="Logo RideCloudMoto" />
+    </div>
+    <div>
+      <div class="brand-name">RideCloud<span>Moto</span></div>
+      <div class="brand-tagline">Le cloud de votre deux-roues</div>
+    </div>
+  </div>
+
+  <div class="cover-badge"><span class="dot"></span> Dossier partenaire concessionnaire</div>
+
+  <div class="cover-spacer"></div>
+
+  <div class="cover-eyebrow">Programme concessionnaire</div>
+  <h1 class="cover-title">Fidélisez vos clients <span>bien après</span> la vente.</h1>
+  <p class="cover-sub">
+    Offrez à chaque acheteur un carnet d'entretien numérique à vos couleurs.
+    Il pense à vous toute l'année, et revient à l'atelier pour ses révisions.
+  </p>
+
+  <div class="cover-pills">
+    <span class="cover-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+      Zéro maintenance technique
+    </span>
+    <span class="cover-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+      L'immatriculation fait le code
+    </span>
+    <span class="cover-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 6 8 10 8 10s8-4 8-10V5l-8-3z"/></svg>
+      Votre vitrine dans l'app
+    </span>
+  </div>
+
+  <div class="cover-foot">
+    <div class="who">
+      Document destiné au <strong>concessionnaire partenaire</strong>.<br/>
+      Comprendre l'offre, le portail et la fidélisation en 4 pages.
+    </div>
+    <div class="site">moto.ridecloud.app</div>
+  </div>
+</section>
+
+<!-- ══════════════════ PAGE 2 — POURQUOI + PRINCIPE ══════════════════ -->
+<section class="page">
+  <div class="pad">
+    <div class="kicker">Pourquoi RideCloudMoto</div>
+    <h2 class="h1">Un outil de fidélisation clé en main</h2>
+    <p class="lead">
+      Le modèle est <strong>B2B2C</strong> : vous distribuez l'application à vos clients et devenez partenaire de la plateforme.
+      Vous gardez le lien avec l'acheteur jusqu'à sa prochaine révision — sans effort technique.
+    </p>
+
+    <div class="section">
+      <div class="value-grid">
+        <div class="value">
+          <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 6 8 10 8 10s8-4 8-10V5l-8-3z"/></svg></div>
+          <div class="value-title">Fidéliser</div>
+          <div class="value-text">Votre client garde une app à vos couleurs dans sa poche toute l'année.</div>
+        </div>
+        <div class="value">
+          <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 3v5h5"/></svg></div>
+          <div class="value-title">Faire revenir à l'atelier</div>
+          <div class="value-text">Rappels d'entretien et prolongation de licence après révision ramènent le client chez vous.</div>
+        </div>
+        <div class="value">
+          <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div>
+          <div class="value-title">Vous différencier</div>
+          <div class="value-text">Un service moderne offert avec chaque véhicule vendu, sans surcoût.</div>
+        </div>
+        <div class="value">
+          <div class="value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="value-title">Rester visible</div>
+          <div class="value-text">Coordonnées, itinéraire, prise de RDV et promotions affichés en permanence dans l'app.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">1</span> Le principe, étape par étape</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-body">
+            <div class="flow-title">Vous enregistrez la vente</div>
+            <div class="flow-text">À la livraison, vous saisissez l'<strong>immatriculation</strong> dans le portail : un code d'activation est créé automatiquement.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-body">
+            <div class="flow-title">Le client active son accès</div>
+            <div class="flow-text">Il scanne le QR du flyer (ou saisit son immatriculation) : son <strong>accès offert démarre</strong>.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-body">
+            <div class="flow-title">Il est rattaché à votre concession</div>
+            <div class="flow-text">Il voit vos <strong>coordonnées, promotions et prise de RDV</strong> dans son application.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-body">
+            <div class="flow-title">Vous le fidélisez</div>
+            <div class="flow-text">Après une révision, vous <strong>prolongez sa licence</strong> — une bonne raison de revenir à l'atelier.</div>
+          </div>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>L'idée clé :</strong> l'immatriculation du véhicule sert de code d'activation. Rien à inventer, aucun code promo à gérer, aucune application à maintenir de votre côté.
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="foot-brand">
+        <div class="foot-mark"><img src="../public/logo256.png" alt="" /></div>
+        <div><div class="foot-name">RideCloudMoto</div><div class="foot-role">Dossier partenaire concessionnaire</div></div>
+      </div>
+      <div class="foot-links"><span>Page 2 · Pourquoi &amp; principe</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ PAGE 3 — LE PORTAIL ══════════════════ -->
+<section class="page">
+  <div class="pad">
+    <div class="kicker">Votre espace pro</div>
+    <h2 class="h1">Le portail concessionnaire</h2>
+    <p class="lead">
+      Vous accédez à un portail dédié avec un compte e-mail créé par l'équipe RideCloudMoto.
+      Deux rôles existent (<strong>Responsable</strong> et <strong>Vendeur</strong>) et disposent des mêmes fonctions.
+    </p>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">2</span> Trois espaces</div>
+      <div class="portal-grid">
+        <div class="portal">
+          <div class="portal-tag">Tableau de bord</div>
+          <div class="portal-title">Votre vue d'ensemble</div>
+          <div class="portal-text">Ventes enregistrées, licences activées et fiches en attente d'activation, en un coup d'œil.</div>
+        </div>
+        <div class="portal">
+          <div class="portal-tag">Nouvelle vente</div>
+          <div class="portal-title">Le geste quotidien</div>
+          <div class="portal-text">À la livraison, saisissez l'immatriculation (et si vous voulez, les coordonnées client). Le code est prêt.</div>
+        </div>
+        <div class="portal">
+          <div class="portal-tag">Licences</div>
+          <div class="portal-title">Suivi &amp; fidélisation</div>
+          <div class="portal-text">La liste de vos clients, leur statut, et le bouton pour prolonger un accès.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">3</span> Suivre &amp; prolonger les licences</div>
+      <table>
+        <thead><tr><th style="width:32%">Statut</th><th>Signification</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge-wait">En attente</span></td><td>Le code a été créé, le client ne l'a pas encore activé.</td></tr>
+          <tr><td><span class="badge-on">Activée</span></td><td>Le client a créé son compte et démarré son offre.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>La prolongation, votre levier commercial.</strong> Pour une licence activée, le bouton <strong>Prolonger</strong> ajoute une période d'accès offert.
+        Cas typique : un client vient réviser sa moto → vous lui offrez une année de plus → il repart fidélisé.
+        <br/>À noter : <strong>une seule prolongation par licence</strong> (garde-fou anti-abus).
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">4</span> Le flyer avec QR code</div>
+      <p class="lead" style="margin-bottom:12px">
+        Pour faciliter l'inscription en boutique : un flyer prêt à l'emploi (QR vers l'inscription) ou un flyer vierge à compléter.
+        Le client scanne → crée son compte → saisit son immatriculation → c'est activé.
+      </p>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-num">1</div><div class="flow-body"><div class="flow-title">Scanne le QR</div><div class="flow-text">depuis le flyer remis en concession.</div></div></div>
+        <div class="flow-step"><div class="flow-num">2</div><div class="flow-body"><div class="flow-title">Crée son compte</div><div class="flow-text">et saisit son immatriculation comme code.</div></div></div>
+        <div class="flow-step"><div class="flow-num">3</div><div class="flow-body"><div class="flow-title">C'est prêt</div><div class="flow-text">suivi d'entretien et rappels automatiques.</div></div></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="foot-brand">
+        <div class="foot-mark"><img src="../public/logo256.png" alt="" /></div>
+        <div><div class="foot-name">RideCloudMoto</div><div class="foot-role">Dossier partenaire concessionnaire</div></div>
+      </div>
+      <div class="foot-links"><span>Page 3 · Le portail</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ PAGE 4 — VITRINE + FAQ + RÉSUMÉ ══════════════════ -->
+<section class="page">
+  <div class="pad">
+    <div class="kicker">Votre présence dans l'app</div>
+    <h2 class="h1">Votre vitrine &amp; vos réponses</h2>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">5</span> La carte « Mon concessionnaire »</div>
+      <p class="lead" style="margin-bottom:12px">Chaque client rattaché voit une page à votre image, qui peut afficher :</p>
+      <div class="vitrine">
+        <div class="vitrine-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Votre logo et vos couleurs (l'app s'adapte à votre marque)</div>
+        <div class="vitrine-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Adresse, téléphone, e-mail, site web</div>
+        <div class="vitrine-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Un bouton Itinéraire GPS</div>
+        <div class="vitrine-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Un bouton Prendre rendez-vous</div>
+        <div class="vitrine-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Vos promotions en cours</div>
+        <div class="vitrine-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Vos horaires d'ouverture</div>
+      </div>
+      <div class="callout">
+        La configuration (logo, couleurs, coordonnées, horaires, promotions, durée d'offre) est réalisée par l'équipe RideCloudMoto à la mise en place. Il suffit de nous transmettre vos éléments.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">6</span> Questions fréquentes</div>
+      <div class="faq">
+        <div class="faq-item"><div class="faq-q">Le client a perdu son code ?</div><div class="faq-a">Son code est son immatriculation. Il la ressaisit dans Paramètres → activer un code.</div></div>
+        <div class="faq-item"><div class="faq-q">Puis-je voir le carnet d'entretien de mes clients ?</div><div class="faq-a">Non. Le portail montre l'état des licences et les coordonnées saisies à la vente, jamais le contenu privé du carnet. C'est un gage de confiance pour le client.</div></div>
+        <div class="faq-item"><div class="faq-q">Que se passe-t-il à la fin de l'offre ?</div><div class="faq-a">L'app passe en lecture seule : le client garde son historique et ses exports, mais ne peut plus rien ajouter. Il peut souscrire au Premium, ou vous pouvez prolonger sa licence.</div></div>
+        <div class="faq-item"><div class="faq-q">Comment ajouter un collègue au portail ?</div><div class="faq-a">Contactez l'équipe RideCloudMoto : elle rattache le compte (par e-mail) à votre concession.</div></div>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-quote">
+        « À chaque vente, vous offrez un carnet d'entretien à <strong>vos couleurs</strong>. Le client pense à vous toute l'année, et vous le faites revenir à l'atelier en <strong>prolongeant son accès</strong> après chaque révision. »
+      </div>
+      <div class="summary-args">
+        <div class="summary-arg"><div class="n">1</div><div class="t"><strong style="color:#fff">Fidélisation active</strong><br/>rappels + prolongation = client qui revient.</div></div>
+        <div class="summary-arg"><div class="n">2</div><div class="t"><strong style="color:#fff">Visibilité permanente</strong><br/>votre vitrine dans la poche du client.</div></div>
+        <div class="summary-arg"><div class="n">3</div><div class="t"><strong style="color:#fff">Simplicité totale</strong><br/>un portail, un geste, aucune technique.</div></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="foot-brand">
+        <div class="foot-mark"><img src="../public/logo256.png" alt="" /></div>
+        <div><div class="foot-name">RideCloudMoto</div><div class="foot-role">info@moto.ridecloud.app</div></div>
+      </div>
+      <div class="foot-links"><a>moto.ridecloud.app</a><br/><span>Page 4 · Vitrine &amp; FAQ</span></div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

@@ -138,6 +138,44 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY profiles_select_own ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY profiles_update_own ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
+-- Sécurité : empêche un utilisateur authentifié de modifier lui-même les colonnes
+-- de facturation / d'accès via l'API Supabase. Seules les écritures via
+-- `service_role` (serveur : webhook Mollie, crons, activation code) les modifient.
+CREATE OR REPLACE FUNCTION public.protect_profile_billing_columns()
+RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $$
+declare
+  req_role text := coalesce(
+    current_setting('request.jwt.claim.role', true),
+    (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role')
+  );
+begin
+  -- service_role (serveur) et accès direct/migration (req_role null) : autorisés.
+  if req_role is null or req_role = 'service_role' then
+    return new;
+  end if;
+
+  -- Utilisateur authentifié : on restaure la valeur d'origine des colonnes
+  -- de facturation et d'accès, quelles que soient les valeurs soumises.
+  new.plan                   := old.plan;
+  new.plan_status            := old.plan_status;
+  new.plan_interval          := old.plan_interval;
+  new.plan_renews_at         := old.plan_renews_at;
+  new.plan_canceled_at       := old.plan_canceled_at;
+  new.mollie_customer_id     := old.mollie_customer_id;
+  new.mollie_subscription_id := old.mollie_subscription_id;
+  new.mollie_mandate_id      := old.mollie_mandate_id;
+  new.dealer_premium_until   := old.dealer_premium_until;
+  new.dealer_id              := old.dealer_id;
+
+  return new;
+end;
+$$;
+
+DROP TRIGGER IF EXISTS trg_protect_profile_billing ON public.profiles;
+CREATE TRIGGER trg_protect_profile_billing
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.protect_profile_billing_columns();
+
 -- ── vehicles ─────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.vehicles (
   id                           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -293,7 +331,7 @@ CREATE POLICY notification_log_select_own ON public.notification_log FOR SELECT 
 
 -- ── set_updated_at trigger générique ─────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.set_updated_at()
-RETURNS trigger LANGUAGE plpgsql AS $$
+RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $$
 BEGIN NEW.updated_at = now(); RETURN NEW; END;
 $$;
 

@@ -7,10 +7,21 @@ import { getDealerMembership } from "@/lib/dealer/membership";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * N'accepte qu'un chemin interne (commençant par un seul "/") pour éviter les
+ * redirections ouvertes (ex. `//evil.com`, `/\evil.com`, `https://evil.com`).
+ */
+function safeInternalPath(value: string | null): string | null {
+  if (!value) return null;
+  if (!value.startsWith("/")) return null;
+  if (value.startsWith("//") || value.startsWith("/\\")) return null;
+  return value;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const nextParam = searchParams.get("next");
+  const nextParam = safeInternalPath(searchParams.get("next"));
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing_code`);
