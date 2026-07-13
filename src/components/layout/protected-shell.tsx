@@ -47,6 +47,7 @@ export function ProtectedShell({
         dealerDaysLeft={state?.dealerDaysLeft ?? null}
         hasDealer={!!dealer}
         isDealerStaff={isDealerStaff}
+        isAdmin={isAdmin}
         appLogoUrl={dealer?.app_logo_url ?? null}
       />
       <div className="header-spacer" aria-hidden />

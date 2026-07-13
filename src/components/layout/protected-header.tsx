@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Settings, Store } from "lucide-react";
+import { Settings, ShieldCheck, Store } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -15,6 +15,7 @@ interface ProtectedHeaderProps {
   dealerDaysLeft?: number | null;
   hasDealer?: boolean;
   isDealerStaff?: boolean;
+  isAdmin?: boolean;
   appLogoUrl?: string | null;
 }
 
@@ -25,6 +26,7 @@ export function ProtectedHeader({
   dealerDaysLeft,
   hasDealer = false,
   isDealerStaff = false,
+  isAdmin = false,
   appLogoUrl = null,
 }: ProtectedHeaderProps) {
   return (
@@ -42,6 +44,19 @@ export function ProtectedHeader({
           ) : null}
         </div>
         <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+          {isAdmin ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mr-0.5 h-9 gap-1.5 px-2 sm:h-10 sm:px-3"
+              asChild
+            >
+              <Link href="/admin/dealers" aria-label="Espace administrateur">
+                <ShieldCheck className="h-4 w-4" />
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            </Button>
+          ) : null}
           {isDealerStaff ? (
             <Button
               variant="outline"

@@ -16,6 +16,7 @@ function makeProfile(overrides: Partial<Profile> = {}): Profile {
     mollie_subscription_id: null,
     mollie_mandate_id: null,
     dealer_premium_until: null,
+    dealer_id: null,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
     ...overrides,
