@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Pencil, Plus, RefreshCw, Store, X } from "lucide-react";
+import { Loader2, MapPin, Pencil, Plus, RefreshCw, Store, X } from "lucide-react";
 import type { Dealer } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -129,6 +129,42 @@ export function DealersManager() {
   React.useEffect(() => {
     load();
   }, [load]);
+
+  const [geocoding, setGeocoding] = React.useState(false);
+
+  /** Remplit latitude/longitude à partir de l'adresse saisie (OpenStreetMap). */
+  async function geocodeAddress() {
+    const query = [form.address, form.postal_code, form.city, "France"]
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .join(", ");
+    if (!form.address.trim() && !form.city.trim()) {
+      toast.error("Renseigne d'abord l'adresse ou la ville.");
+      return;
+    }
+    setGeocoding(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
+        { headers: { Accept: "application/json" } }
+      );
+      const results = (await res.json()) as { lat: string; lon: string }[];
+      if (!results?.length) {
+        toast.error("Adresse introuvable. Vérifie l'orthographe ou complète la ville.");
+        return;
+      }
+      setForm((prev) => ({
+        ...prev,
+        latitude: Number(results[0].lat).toFixed(6),
+        longitude: Number(results[0].lon).toFixed(6),
+      }));
+      toast.success("Coordonnées GPS trouvées.");
+    } catch {
+      toast.error("Service de géolocalisation indisponible. Réessaie plus tard.");
+    } finally {
+      setGeocoding(false);
+    }
+  }
 
   function toggleBrand(brand: string) {
     setForm((prev) => ({
@@ -290,6 +326,10 @@ export function DealersManager() {
                     onChange={(e) => set("slug", e.target.value)}
                     placeholder="voge-moto-lyon (auto si vide)"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Identifiant technique unique (minuscules, sans espaces). Laisse vide :
+                    il est généré automatiquement depuis le nom.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="d-logo">Logo concessionnaire (URL)</Label>
@@ -441,23 +481,42 @@ export function DealersManager() {
                     placeholder="https://…/rdv"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="d-lat">Latitude</Label>
-                  <Input
-                    id="d-lat"
-                    value={form.latitude}
-                    onChange={(e) => set("latitude", e.target.value)}
-                    placeholder="45.7640"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="d-lng">Longitude</Label>
-                  <Input
-                    id="d-lng"
-                    value={form.longitude}
-                    onChange={(e) => set("longitude", e.target.value)}
-                    placeholder="4.8357"
-                  />
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Coordonnées GPS (carte « Mon concessionnaire »)</Label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Input
+                      aria-label="Latitude"
+                      value={form.latitude}
+                      onChange={(e) => set("latitude", e.target.value)}
+                      placeholder="Latitude (45.7640)"
+                      className="max-w-44"
+                    />
+                    <Input
+                      aria-label="Longitude"
+                      value={form.longitude}
+                      onChange={(e) => set("longitude", e.target.value)}
+                      placeholder="Longitude (4.8357)"
+                      className="max-w-44"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={geocodeAddress}
+                      disabled={geocoding}
+                    >
+                      {geocoding ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <MapPin className="h-4 w-4" />
+                      )}
+                      Trouver depuis l&apos;adresse
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Saisis l&apos;adresse, le code postal et la ville ci-dessus, puis clique
+                    sur « Trouver depuis l&apos;adresse » pour remplir automatiquement.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="d-offer">Durée de l&apos;offre (mois)</Label>
