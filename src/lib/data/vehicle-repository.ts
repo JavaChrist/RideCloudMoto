@@ -108,7 +108,7 @@ export async function ensureMaintenancePlanForVehicle(
   supabase: SupabaseClient,
   vehicle: Vehicle
 ): Promise<void> {
-  const { templates } = resolveTemplatesForVehicle(vehicle);
+  const { templates } = await resolveTemplatesForVehicle(supabase, vehicle);
   if (templates.length === 0) return;
 
   const { data: existing } = await supabase

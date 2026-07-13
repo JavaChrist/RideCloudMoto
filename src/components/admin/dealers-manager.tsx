@@ -35,7 +35,7 @@ interface DealerFormState {
   website: string;
   latitude: string;
   longitude: string;
-  brands: string;
+  brands: string[];
   booking_url: string;
   offer_months: string;
   hours: string;
@@ -58,7 +58,7 @@ const EMPTY_FORM: DealerFormState = {
   website: "",
   latitude: "",
   longitude: "",
-  brands: "",
+  brands: [],
   booking_url: "",
   offer_months: "12",
   hours: "",
@@ -82,7 +82,7 @@ function dealerToForm(d: Dealer): DealerFormState {
     website: d.website ?? "",
     latitude: d.latitude != null ? String(d.latitude) : "",
     longitude: d.longitude != null ? String(d.longitude) : "",
-    brands: (d.brands ?? []).join(", "),
+    brands: d.brands ?? [],
     booking_url: d.booking_url ?? "",
     offer_months: String(d.offer_months ?? 12),
     hours: d.hours ? JSON.stringify(d.hours, null, 2) : "",
@@ -92,6 +92,7 @@ function dealerToForm(d: Dealer): DealerFormState {
 
 export function DealersManager() {
   const [dealers, setDealers] = React.useState<Dealer[]>([]);
+  const [catalogBrands, setCatalogBrands] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [form, setForm] = React.useState<DealerFormState>(EMPTY_FORM);
@@ -100,13 +101,24 @@ export function DealersManager() {
   const load = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/dealers");
-      const data = await res.json();
-      if (!res.ok) {
+      const [dealersRes, catalogRes] = await Promise.all([
+        fetch("/api/admin/dealers"),
+        fetch("/api/admin/catalog"),
+      ]);
+      const data = await dealersRes.json();
+      if (!dealersRes.ok) {
         toast.error(data.error ?? "Erreur de chargement");
         return;
       }
       setDealers(data.dealers ?? []);
+      if (catalogRes.ok) {
+        const catalog = await catalogRes.json();
+        setCatalogBrands(
+          ((catalog.brands ?? []) as { name: string; is_active: boolean }[])
+            .filter((b) => b.is_active)
+            .map((b) => b.name)
+        );
+      }
     } catch {
       toast.error("Erreur réseau");
     } finally {
@@ -117,6 +129,15 @@ export function DealersManager() {
   React.useEffect(() => {
     load();
   }, [load]);
+
+  function toggleBrand(brand: string) {
+    setForm((prev) => ({
+      ...prev,
+      brands: prev.brands.includes(brand)
+        ? prev.brands.filter((b) => b !== brand)
+        : [...prev.brands, brand],
+    }));
+  }
 
   function set<K extends keyof DealerFormState>(key: K, value: DealerFormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -210,6 +231,9 @@ export function DealersManager() {
             Actualiser
           </Button>
           <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/catalogue">Catalogue →</Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
             <Link href="/admin/dealer-codes">Codes →</Link>
           </Button>
           {!showForm ? (
@@ -292,13 +316,27 @@ export function DealersManager() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="d-brands">Marques distribuées</Label>
-                  <Input
-                    id="d-brands"
-                    value={form.brands}
-                    onChange={(e) => set("brands", e.target.value)}
-                    placeholder="Voge, Kawasaki (séparées par des virgules)"
-                  />
+                  <Label>Marques distribuées</Label>
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 rounded-lg border px-3 py-2.5">
+                    {/* Marques du catalogue + éventuelles marques historiques hors catalogue */}
+                    {[...new Set([...catalogBrands, ...form.brands])].map((brand) => (
+                      <label key={brand} className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={form.brands.includes(brand)}
+                          onChange={() => toggleBrand(brand)}
+                        />
+                        {brand}
+                        {!catalogBrands.includes(brand) ? (
+                          <span className="text-xs text-muted-foreground">(hors catalogue)</span>
+                        ) : null}
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Le client rattaché ne verra que les modèles de ces marques. Aucune
+                    coche = tout le catalogue. Marques gérées depuis la page Catalogue.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="d-primary">Couleur principale</Label>

@@ -3,8 +3,8 @@ import { z } from "zod";
 const currentYear = new Date().getFullYear();
 
 export const vehicleFormSchema = z.object({
-  category: z.enum(["motos", "scooters"], { message: "Catégorie invalide" }),
-  marque: z.string().min(1, "Marque requise"),
+  category: z.enum(["motos", "scooters", "quads"], { message: "Catégorie invalide" }),
+  marque: z.string().min(1, "Marque requise").max(60),
   modele: z.string().min(1, "Modèle requis"),
   annee: z
     .number({ error: "Année invalide" })

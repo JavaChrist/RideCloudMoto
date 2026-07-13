@@ -17,6 +17,12 @@ const KM_PER_YEAR: Record<VehicleCategory, Record<UsageProfile, number>> = {
     occasional: 2500,
     rare: 1200,
   },
+  quads: {
+    daily: 6000,
+    often: 3000,
+    occasional: 1500,
+    rare: 800,
+  },
 };
 
 export const USAGE_PROFILE_LABELS: Record<UsageProfile, string> = {

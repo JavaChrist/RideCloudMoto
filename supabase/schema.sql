@@ -180,7 +180,7 @@ CREATE TRIGGER trg_protect_profile_billing
 CREATE TABLE IF NOT EXISTS public.vehicles (
   id                           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id                      uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  category                     text NOT NULL CHECK (category IN ('motos','scooters')),
+  category                     text NOT NULL CHECK (category IN ('motos','scooters','quads')),
   marque                       text NOT NULL,
   modele                       text NOT NULL,
   annee                        integer NOT NULL,
@@ -411,6 +411,78 @@ ALTER TABLE public.dealer_activation_codes ENABLE ROW LEVEL SECURITY;
 INSERT INTO public.dealers (slug, name, primary_color, brands, offer_months, is_active)
 VALUES ('voge', 'Voge', '#FACC15', ARRAY['Voge'], 12, true)
 ON CONFLICT (slug) DO NOTHING;
+
+-- ── Catalogue multi-marques (géré par l'admin, lecture pour les clients) ────
+-- Voir supabase/migrations/20260713_catalog_multibrand.sql et
+-- 20260713_catalog_seed.sql pour le seed complet (Voge, Kawasaki, Suzuki,
+-- CF Moto, Zontes).
+CREATE TABLE IF NOT EXISTS public.catalog_brands (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name       text NOT NULL UNIQUE,
+  slug       text NOT NULL UNIQUE,
+  logo_url   text,
+  is_active  boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.catalog_maintenance_profiles (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key        text NOT NULL UNIQUE,
+  label      text NOT NULL,
+  tasks      jsonb NOT NULL DEFAULT '[]',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.catalog_models (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  brand_id   uuid NOT NULL REFERENCES public.catalog_brands(id) ON DELETE CASCADE,
+  name       text NOT NULL,
+  category   text NOT NULL CHECK (category IN ('motos', 'scooters', 'quads')),
+  years      integer[] NOT NULL DEFAULT '{}',
+  specs      jsonb NOT NULL DEFAULT '{}',
+  notice_url text,
+  profile_id uuid REFERENCES public.catalog_maintenance_profiles(id) ON DELETE SET NULL,
+  is_active  boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (brand_id, category, name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_catalog_models_brand ON public.catalog_models(brand_id);
+CREATE INDEX IF NOT EXISTS idx_catalog_models_category ON public.catalog_models(category);
+
+DROP TRIGGER IF EXISTS trg_catalog_brands_updated ON public.catalog_brands;
+CREATE TRIGGER trg_catalog_brands_updated
+  BEFORE UPDATE ON public.catalog_brands
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+DROP TRIGGER IF EXISTS trg_catalog_profiles_updated ON public.catalog_maintenance_profiles;
+CREATE TRIGGER trg_catalog_profiles_updated
+  BEFORE UPDATE ON public.catalog_maintenance_profiles
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+DROP TRIGGER IF EXISTS trg_catalog_models_updated ON public.catalog_models;
+CREATE TRIGGER trg_catalog_models_updated
+  BEFORE UPDATE ON public.catalog_models
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+ALTER TABLE public.catalog_brands ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.catalog_maintenance_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.catalog_models ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "catalog_brands_read" ON public.catalog_brands;
+CREATE POLICY "catalog_brands_read" ON public.catalog_brands
+  FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "catalog_profiles_read" ON public.catalog_maintenance_profiles;
+CREATE POLICY "catalog_profiles_read" ON public.catalog_maintenance_profiles
+  FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "catalog_models_read" ON public.catalog_models;
+CREATE POLICY "catalog_models_read" ON public.catalog_models
+  FOR SELECT TO authenticated USING (true);
 
 -- ── Trigger création profil (sans offre automatique) ───────────────────────
 CREATE OR REPLACE FUNCTION public.handle_new_user()

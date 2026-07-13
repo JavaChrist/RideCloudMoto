@@ -14,7 +14,7 @@ import { MaintenancePlanList } from "@/components/history/maintenance-plan-list"
 import { HistorySections } from "@/components/history/history-sections";
 import { ModificationsList } from "@/components/modifications/modifications-list";
 import { DocumentsList } from "@/components/documents/documents-list";
-import { TechnicalSheet } from "@/components/vehicles/technical-sheet";
+import { TechnicalSheet, type TechnicalSheetData } from "@/components/vehicles/technical-sheet";
 import { cn } from "@/lib/utils";
 
 const SECTIONS = [
@@ -38,6 +38,7 @@ interface Props {
   isPremium: boolean;
   hasAccess: boolean;
   isReadOnly: boolean;
+  technicalSheet: TechnicalSheetData | null;
 }
 
 export function VehicleDetailTabs({
@@ -51,6 +52,7 @@ export function VehicleDetailTabs({
   isPremium,
   hasAccess,
   isReadOnly,
+  technicalSheet,
 }: Props) {
   const [tab, setTab] = useState<SectionValue>("plan");
 
@@ -95,7 +97,7 @@ export function VehicleDetailTabs({
       </TabsContent>
 
       <TabsContent value="technique">
-        <TechnicalSheet vehicle={vehicle} />
+        <TechnicalSheet vehicle={vehicle} catalog={technicalSheet} />
       </TabsContent>
 
       <TabsContent value="modifs">

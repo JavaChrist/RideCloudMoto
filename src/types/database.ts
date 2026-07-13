@@ -1,4 +1,4 @@
-export type VehicleCategory = "motos" | "scooters";
+export type VehicleCategory = "motos" | "scooters" | "quads";
 export type Plan = "free" | "premium";
 export type PlanStatus = "active" | "past_due" | "canceled" | "pending";
 export type PlanInterval = "monthly" | "yearly";
@@ -78,6 +78,42 @@ export interface DealerUser {
   user_id: string;
   role: DealerRole;
   created_at: string;
+}
+
+// ── Catalogue multi-marques (géré par l'admin) ──────────────────────────────
+
+export interface CatalogBrand {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CatalogMaintenanceProfile {
+  id: string;
+  key: string;
+  label: string;
+  /** Tableau de tâches au format MaintenanceTemplate (camelCase). */
+  tasks: unknown[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CatalogModel {
+  id: string;
+  brand_id: string;
+  name: string;
+  category: VehicleCategory;
+  years: number[];
+  specs: Record<string, string>;
+  notice_url: string | null;
+  profile_id: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Vehicle {

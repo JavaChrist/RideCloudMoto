@@ -6,11 +6,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, ImagePlus, Bike, X } from "lucide-react";
 import type { VehicleCategory } from "@/types/database";
-import {
-  getModelsByCategory,
-  findCatalogModel,
-  CATEGORY_LABELS_SINGULAR,
-} from "@/lib/data/vehicle-catalog";
+import type { FormCatalogBrand } from "@/lib/catalog/catalog-repository";
+import { CATEGORY_LABELS_SINGULAR } from "@/lib/data/categories";
+import { ALL_CATEGORIES } from "@/lib/data/demo";
 import { FUEL_OPTIONS } from "@/lib/data/fuel-options";
 import { USAGE_PROFILE_LABELS, USAGE_PROFILE_DESCRIPTIONS } from "@/lib/usage-profile";
 import { defaultIllustration } from "@/lib/data/demo";
@@ -31,22 +29,47 @@ const selectClass =
 export function AddVehicleForm({
   defaultCategory,
   userId,
+  catalog,
 }: {
   defaultCategory?: VehicleCategory;
   userId: string;
+  catalog: FormCatalogBrand[];
 }) {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [category, setCategory] = React.useState<VehicleCategory>(defaultCategory ?? "motos");
+  const [marque, setMarque] = React.useState("");
   const [modele, setModele] = React.useState("");
   const [usage, setUsage] = React.useState<(typeof USAGE_PROFILES)[number]>("often");
   const [photoFile, setPhotoFile] = React.useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
   const photoInputRef = React.useRef<HTMLInputElement>(null);
 
-  const models = React.useMemo(() => getModelsByCategory(category), [category]);
-  const selectedModel = findCatalogModel(category, modele);
-  const availableYears = selectedModel?.annees ?? [];
+  // Marques proposant au moins un modèle dans la catégorie choisie.
+  const brands = React.useMemo(
+    () => catalog.filter((b) => b.models.some((m) => m.category === category)),
+    [catalog, category]
+  );
+  // Marque effective : la sélection, ou l'unique marque disponible.
+  const effectiveMarque = marque || (brands.length === 1 ? brands[0].name : "");
+  const selectedBrand = brands.find((b) => b.name === effectiveMarque);
+
+  const models = React.useMemo(
+    () => (selectedBrand?.models ?? []).filter((m) => m.category === category),
+    [selectedBrand, category]
+  );
+  const selectedModel = models.find((m) => m.name.toLowerCase() === modele.toLowerCase());
+  const availableYears = selectedModel?.years ?? [];
+
+  function handleCategoryChange(cat: VehicleCategory) {
+    setCategory(cat);
+    setModele("");
+    // On garde la marque si elle existe encore dans la nouvelle catégorie.
+    const stillThere = catalog.some(
+      (b) => b.name === effectiveMarque && b.models.some((m) => m.category === cat)
+    );
+    if (!stillThere) setMarque("");
+  }
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -88,7 +111,7 @@ export function AddVehicleForm({
 
     const payload = {
       category,
-      marque: "Voge",
+      marque: effectiveMarque,
       modele,
       annee: Number(fd.get("annee")),
       kilometrage: Number(fd.get("kilometrage") || 0),
@@ -171,15 +194,12 @@ export function AddVehicleForm({
           {/* Catégorie */}
           <div className="space-y-2">
             <Label>Catégorie</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {(["motos", "scooters"] as VehicleCategory[]).map((cat) => (
+            <div className="grid grid-cols-3 gap-2">
+              {ALL_CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   type="button"
-                  onClick={() => {
-                    setCategory(cat);
-                    setModele("");
-                  }}
+                  onClick={() => handleCategoryChange(cat)}
                   className={`rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
                     category === cat
                       ? "border-primary bg-accent text-accent-foreground"
@@ -192,6 +212,37 @@ export function AddVehicleForm({
             </div>
           </div>
 
+          {/* Marque */}
+          <div className="space-y-2">
+            <Label htmlFor="marque">
+              Marque <span className="text-destructive">*</span>
+            </Label>
+            {brands.length === 0 ? (
+              <p className="rounded-lg border border-dashed px-3 py-2.5 text-sm text-muted-foreground">
+                Aucune marque disponible pour cette catégorie. Rapprochez-vous de
+                votre concessionnaire.
+              </p>
+            ) : (
+              <select
+                id="marque"
+                value={effectiveMarque}
+                onChange={(e) => {
+                  setMarque(e.target.value);
+                  setModele("");
+                }}
+                required
+                className={selectClass}
+              >
+                <option value="">Sélectionnez une marque…</option>
+                {brands.map((b) => (
+                  <option key={b.slug} value={b.name}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
           {/* Modèle */}
           <div className="space-y-2">
             <Label htmlFor="modele">
@@ -202,12 +253,15 @@ export function AddVehicleForm({
               value={modele}
               onChange={(e) => setModele(e.target.value)}
               required
+              disabled={!effectiveMarque}
               className={selectClass}
             >
-              <option value="">Sélectionnez un modèle…</option>
+              <option value="">
+                {effectiveMarque ? "Sélectionnez un modèle…" : "Choisissez d'abord une marque"}
+              </option>
               {models.map((m) => (
-                <option key={m.modele} value={m.modele}>
-                  {m.modele}
+                <option key={m.name} value={m.name}>
+                  {m.name}
                 </option>
               ))}
             </select>
@@ -302,7 +356,7 @@ export function AddVehicleForm({
             <span className="text-destructive">*</span> Champs obligatoires.
           </p>
 
-          <Button type="submit" className="w-full" disabled={loading || !modele}>
+          <Button type="submit" className="w-full" disabled={loading || !effectiveMarque || !modele}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ajouter le véhicule"}
           </Button>
         </form>

@@ -7,7 +7,6 @@ import { getUserPlanState } from "@/lib/billing/limits";
 import { getWriteGuard } from "@/lib/billing/write-guard";
 import { avgKmPerYear } from "@/lib/usage-profile";
 import { vehicleFormSchema } from "@/lib/validators/vehicle";
-import { BRAND_INTERNAL } from "@/lib/data/vehicle-catalog";
 import { isAdminEmail } from "@/lib/admin";
 import type { Profile, UsageProfile, Vehicle, VehicleCategory } from "@/types/database";
 
@@ -76,7 +75,7 @@ export async function createVehicle(input: unknown): Promise<ActionResult> {
     .insert({
       user_id: user.id,
       category: v.category as VehicleCategory,
-      marque: v.marque || BRAND_INTERNAL,
+      marque: v.marque,
       modele: v.modele,
       annee: v.annee,
       kilometrage: v.kilometrage,
@@ -98,7 +97,7 @@ export async function createVehicle(input: unknown): Promise<ActionResult> {
     return { ok: false, error: error?.message ?? "Échec de la création" };
   }
 
-  // Génération automatique du plan d'entretien (templates Voge)
+  // Génération automatique du plan d'entretien (catalogue constructeur ou générique)
   try {
     await ensureMaintenancePlanForVehicle(supabase, inserted as Vehicle);
   } catch (e) {

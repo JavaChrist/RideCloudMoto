@@ -16,9 +16,15 @@ export const CATEGORY_META: Record<
     description: "Urbains et GT à transmission CVT",
     illustration: "/illustrations/scooter-default.png",
   },
+  quads: {
+    label: "Quads",
+    labelSingular: "Quad",
+    description: "Loisir et utilitaires 4x4",
+    illustration: "/illustrations/quad-default.png",
+  },
 };
 
-export const ALL_CATEGORIES: VehicleCategory[] = ["motos", "scooters"];
+export const ALL_CATEGORIES: VehicleCategory[] = ["motos", "scooters", "quads"];
 
 /** Illustration par défaut (rendu) à afficher quand un véhicule n'a pas de photo. */
 export function defaultIllustration(category: VehicleCategory): string {

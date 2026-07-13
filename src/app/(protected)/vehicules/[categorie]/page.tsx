@@ -12,7 +12,7 @@ import type { MaintenancePlanEntry, VehicleCategory } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
-const VALID: VehicleCategory[] = ["motos", "scooters"];
+const VALID: VehicleCategory[] = ["motos", "scooters", "quads"];
 
 export default async function CategoryVehiclesPage({
   params,

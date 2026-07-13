@@ -22,12 +22,12 @@ export default async function CategoriesPage() {
     .select("category")
     .eq("user_id", user!.id);
 
-  const counts: Record<VehicleCategory, number> = { motos: 0, scooters: 0 };
+  const counts: Record<VehicleCategory, number> = { motos: 0, scooters: 0, quads: 0 };
   (vehicles ?? []).forEach((v: { category: VehicleCategory }) => {
     counts[v.category] = (counts[v.category] ?? 0) + 1;
   });
 
-  const total = counts.motos + counts.scooters;
+  const total = counts.motos + counts.scooters + counts.quads;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
